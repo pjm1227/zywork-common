@@ -1,0 +1,13 @@
+{
+  "title": "用户信息",
+  "columnNames": [
+    "编号",
+    "姓名",
+    "手机号"
+  ],
+  "properties":[
+    "id",
+    "name",
+    "phone"
+  ]
+}

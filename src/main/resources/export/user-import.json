@@ -1,0 +1,9 @@
+{
+  "beginRow": 2,
+  "destinationClass":"top.zywork.service.UserImportDTO",
+  "properties":[
+    "id",
+    "name",
+    "phone"
+  ]
+}
