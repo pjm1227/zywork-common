@@ -61,6 +61,13 @@ public interface BaseService {
     Object getById(Serializable id);
 
     /**
+     * 根据主体表id查找数据，针对关联表查询
+     * @param id 主体表主键字段值
+     * @return 关联数据的记录对应的DTO集合
+     */
+    List<Object> listById(Serializable id);
+
+    /**
      * 查找所有记录数据
      * @return DTO数据传输对象组成的List列表
      */

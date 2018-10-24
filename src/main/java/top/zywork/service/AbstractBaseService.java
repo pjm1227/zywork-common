@@ -94,6 +94,20 @@ public abstract class AbstractBaseService implements BaseService {
     }
 
     @Override
+    public List<Object> listById(Serializable id) {
+        try {
+            List<Object> doObjList = baseDAO.listById(id);
+            List<Object> dtoObjList = new ArrayList<>();
+            if (doObjList != null && doObjList.size() > 0) {
+                dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
+            }
+            return dtoObjList;
+        } catch (RuntimeException e) {
+            throw ExceptionUtils.serviceException(e);
+        }
+    }
+
+    @Override
     public List<Object> listAll() {
         try {
             List<Object> doObjList = baseDAO.listAll();

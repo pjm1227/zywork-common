@@ -1,8 +1,5 @@
 package top.zywork.dao;
 
-
-import top.zywork.query.PageQuery;
-
 import java.io.Serializable;
 import java.util.List;
 
@@ -53,11 +50,18 @@ public interface BaseDAO {
     void updateBatch(List<Object> dataObjList);
 
     /**
-     * 根据主键id查找数据
+     * 根据主键id查找数据，针对单表查询
      * @param id 主键字段值
      * @return 主键字段对应记录的DO对象
      */
     Object getById(Serializable id);
+
+    /**
+     * 根据主体表id查找数据，针对关联表查询
+     * @param id 主体表主键字段值
+     * @return 关联数据的记录对应的DO集合
+     */
+    List<Object> listById(Serializable id);
 
     /**
      * 查找所有记录数据
