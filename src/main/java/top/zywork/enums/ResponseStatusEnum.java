@@ -12,8 +12,10 @@ public enum ResponseStatusEnum {
     OK(1001, "成功"),
     ERROR(1002, "系统错误"),
     DATA_ERROR(1003, "参数错误"),
-    AUTHENTICATION_ERROR(1004, "未认证的用户"),
-    AUTHORIZATION_ERROR(1005, "未授权的用户");
+    AUTHENTICATION_FAILURE(1004, "用户认证失败"),
+    AUTHENTICATION_ERROR(1005, "未认证的用户"),
+    AUTHENTICATION_TOKEN_ERROR(1006, "用户Token错误"),
+    AUTHORIZATION_ERROR(1007, "未授权的用户");
 
     private Integer code;
     private String message;
