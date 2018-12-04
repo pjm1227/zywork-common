@@ -11,7 +11,8 @@ public enum CharsetEnum {
 
     UTF8("UTF-8"),
     GBK("GBK"),
-    GB2312("GB2312");
+    GB2312("GB2312"),
+    ISO8859_1("ISO8859-1");
 
     private String value;
 
