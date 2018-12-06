@@ -142,35 +142,34 @@ public class WebUtils {
         return getServletContext().getContextPath();
     }
 
-    /**
-     * 从客户端cookies中获取会话id
-     *
-     * @param request HttpServletRequest对象
-     * @return
-     */
-    public static String getSessionIdFromCookie(HttpServletRequest request) {
-        return getSessionIdFromCookie(request, SESSION_ID_NAME);
-    }
 
     /**
-     * 从客户端cookies中获取会话id
-     *
-     * @param request HttpServletRequest对象
-     * @param sessionIdName session id的名称
+     * 根据cookie名称获取Cookie对象
+     * @param request
+     * @param name
      * @return
      */
-    public static String getSessionIdFromCookie(HttpServletRequest request, String sessionIdName) {
-        String sessionId = null;
+    public static Cookie getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null && cookies.length > 0) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(sessionIdName)) {
-                    sessionId = cookie.getValue();
-                    break;
+                if (cookie.getName().equals(name)) {
+                    return cookie;
                 }
             }
         }
-        return sessionId;
+        return null;
+    }
+
+    /**
+     * 根据cookie名称获取cookie值
+     * @param request
+     * @param name
+     * @return
+     */
+    public static String getCookieValue(HttpServletRequest request, String name) {
+        Cookie cookie = getCookie(request, name);
+        return cookie != null ? cookie.getValue() : null;
     }
 
 }
