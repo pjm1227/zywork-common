@@ -39,7 +39,7 @@ public class VerifyCodeUtils {
         graphics.setColor(ColorUtils.backColor());
         graphics.fillRect(0, 0, WIDTH, HEIGHT);
         graphics.setColor(new Color(0, 0, 0));
-        graphics.setFont(new Font("黑体", Font.BOLD, 20));
+        graphics.setFont(new Font("黑体", Font.BOLD + Font.ITALIC, 20));
         graphics.drawString(verifyCode, 20, HEIGHT / 2 + 10);
         for (int i = 0; i < LINE_COUNT; i++) {
             graphics.setColor(ColorUtils.backColor());
