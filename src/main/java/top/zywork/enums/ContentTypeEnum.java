@@ -15,7 +15,8 @@ public enum ContentTypeEnum {
     TEXT_PLAIN("text/plain; charset=UTF-8"),
     XML("text/xml; charset=UTF-8"),
     JSON("application/json; charset=UTF-8"),
-    FORM_URLENCODED("application/x-www-form-urlencoded");
+    FORM_URLENCODED("application/x-www-form-urlencoded"),
+    PNG("image/png");
 
     private String value;
 
