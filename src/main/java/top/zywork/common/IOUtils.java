@@ -3,6 +3,7 @@ package top.zywork.common;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.zywork.enums.CharsetEnum;
 
 import java.io.*;
 
@@ -20,11 +21,12 @@ public class IOUtils {
     /**
      * 获取指定文件内的所有字符文本内容
      * @param path 指定文件的路径
+     * @param charsetName 编码名称
      * @return 文件的所有文本内容
      */
-    public static String getText(String path) {
+    public static String getText(String path, String charsetName) {
         try {
-            return getText(new FileInputStream(path));
+            return getText(new FileInputStream(path), charsetName);
         } catch (FileNotFoundException e) {
             logger.error("file {} not found error: {}", path, e.getMessage());
         }
@@ -32,15 +34,25 @@ public class IOUtils {
     }
 
     /**
+     * 以UTF-8编码读取文件内的字符文本内容
+     * @param path
+     * @return
+     */
+    public static String getText(String path) {
+        return getText(path, CharsetEnum.UTF8.getValue());
+    }
+
+    /**
      * 获取指定输入流的所有字符文本内容，不会关闭输入流参数
      * @param inputStream 字符文件输入流
+     * @param charsetName 编码名称
      * @return 文件的所有文本内容
      */
-    public static String getText(InputStream inputStream) {
+    public static String getText(InputStream inputStream, String charsetName) {
         StringBuilder text = new StringBuilder();
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(inputStream));
+            reader = new BufferedReader(new InputStreamReader(inputStream, charsetName));
             String str;
             while ((str = reader.readLine()) != null) {
                 text.append(str);
@@ -57,6 +69,15 @@ public class IOUtils {
             }
         }
         return text.toString();
+    }
+
+    /**
+     * 使用UTF-8编码读取指定输入流中的字符文本内容
+     * @param inputStream
+     * @return
+     */
+    public static String getText(InputStream inputStream) {
+        return getText(inputStream, CharsetEnum.UTF8.getValue());
     }
 
     /**
