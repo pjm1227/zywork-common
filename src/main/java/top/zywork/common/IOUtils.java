@@ -1,5 +1,6 @@
 package top.zywork.common;
 
+import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,6 +119,28 @@ public class IOUtils {
         } catch (IOException e) {
             logger.error("read input stream to output stream error: {}", e.getMessage());
         }
+    }
+
+    /**
+     * 把JSON文件读入到指定的对象中
+     * @param path json文件路径
+     * @param tClass 指定的对象类
+     * @param <T>
+     * @return
+     */
+    public static <T> T readJsonFileToObject(String path, Class<T> tClass) {
+        return readJsonStrToObject(getText(path), tClass);
+    }
+
+    /**
+     * 把JSON字符串读入到指定的对象中
+     * @param jsonStr json字符中
+     * @param tClass 指定的对象类
+     * @param <T>
+     * @return
+     */
+    public static <T> T readJsonStrToObject(String jsonStr, Class<T> tClass) {
+        return JSON.parseObject(jsonStr, tClass);
     }
 
 }
