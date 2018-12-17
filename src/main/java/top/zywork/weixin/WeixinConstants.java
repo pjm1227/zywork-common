@@ -10,9 +10,6 @@ package top.zywork.weixin;
  */
 public class WeixinConstants {
 
-    // 服务器根域名
-    public static final String BASE_URL = "http://www.zywork.top";
-
     // 微信返回消息，如果出错，则包含有errcode
     public static final String ERROR_CODE_STR = "errcode";
 

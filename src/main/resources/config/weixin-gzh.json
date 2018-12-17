@@ -1,0 +1,6 @@
+{
+  "appId": "appId",
+  "appSecret": "appSecret",
+  "baseUrl": "http://www.zywork.top",
+  "loginRedirectUrl": ""
+}

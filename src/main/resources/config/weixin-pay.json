@@ -1,0 +1,6 @@
+{
+  "mchId": "mchId",
+  "apiSecret": "apiSecret",
+  "baseUrl": "http://www.zywork.top",
+  "payNotifyUrl": "/byjc/tickeorder/result"
+}

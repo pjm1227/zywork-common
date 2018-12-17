@@ -30,11 +30,13 @@ public class WeixinUtils {
 
     /**
      * 微信公众号授权登录通过code获取access_token和openid
+     * @param appId 公众号id
+     * @param appSecret 公众号key
      * @param code 微信授权回调所返回的code
      * @return
      */
-    public static GzhAuth authGzh(String code) {
-        String accessor = HttpUtils.get(GzhConstants.AUTH_ACCESS_TOKEN_URL.replace("{CODE}", code));
+    public static GzhAuth authGzh(String appId, String appSecret, String code) {
+        String accessor = HttpUtils.get(GzhConstants.AUTH_ACCESS_TOKEN_URL.replace("{APP_ID}", appId).replace("{APP_KEY}", appSecret).replace("{CODE}", code));
         GzhAuth gzhAuth = null;
         if (StringUtils.isNotEmpty(accessor) && !accessor.contains(WeixinConstants.ERROR_CODE_STR)) {
             JSONObject accessorJSON = JSON.parseObject(accessor);
@@ -47,11 +49,13 @@ public class WeixinUtils {
 
     /**
      * 微信小程序授权登录，通过code来获取session_key 和 openid
-     * @param code
+     * @param appId 小程序id
+     * @param appSecret 小程序key
+     * @param code 小程序登录时获取的code
      * @return
      */
-    public static XcxAuth authXcx(String code) {
-        String accessor = HttpUtils.get(XcxConstants.AUTH_ACCESS_URL.replace("{JSCODE}", code));
+    public static XcxAuth authXcx(String appId, String appSecret, String code) {
+        String accessor = HttpUtils.get(XcxConstants.AUTH_ACCESS_URL.replace("{APP_ID}", appId).replace("{APP_KEY}", appSecret).replace("{JSCODE}", code));
         XcxAuth xcxAuth = null;
         if (StringUtils.isNotEmpty(accessor) && !accessor.contains(WeixinConstants.ERROR_CODE_STR)) {
             JSONObject accessorJSON = JSON.parseObject(accessor);
@@ -105,9 +109,10 @@ public class WeixinUtils {
      * @param body
      * @param attach
      * @param totalFee
+     * @param payNotifyUrl
      * @return
      */
-    public static Map<String, String> unifiedOrderData(String appId, String mchId, String apiKey, String openid, String orderNo, String ip, String body, String attach, int totalFee) {
+    public static Map<String, String> unifiedOrderData(String appId, String mchId, String apiKey, String openid, String orderNo, String ip, String body, String attach, int totalFee, String payNotifyUrl) {
         Map<String, String> data = new HashMap<>();
         data.put("appid", appId);
         data.put("mch_id", mchId);
@@ -120,7 +125,7 @@ public class WeixinUtils {
         data.put("total_fee", totalFee +"");
         data.put("trade_type", PayConstants.TRADE_JSAPI);
         data.put("spbill_create_ip", ip);
-        data.put("notify_url", PayConstants.PAY_NOTIFY_URL);
+        data.put("notify_url", payNotifyUrl);
         try {
             data.put("sign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
         } catch (Exception e) {
@@ -140,10 +145,11 @@ public class WeixinUtils {
      * @param body
      * @param attach
      * @param totalFee
+     * @param payNotifyUrl
      * @return
      */
-    public static Map<String, String> unifiedOrder(String appId, String mchId, String apiKey, String openid, String orderNo, String ip, String body, String attach, int totalFee) {
-        Map<String, String> unifiedOrderData = unifiedOrderData(appId, mchId, apiKey, openid, orderNo, ip, body, attach, totalFee);
+    public static Map<String, String> unifiedOrder(String appId, String mchId, String apiKey, String openid, String orderNo, String ip, String body, String attach, int totalFee, String payNotifyUrl) {
+        Map<String, String> unifiedOrderData = unifiedOrderData(appId, mchId, apiKey, openid, orderNo, ip, body, attach, totalFee, payNotifyUrl);
         try {
             String unifiedOrderResult = HttpUtils.postXML(PayConstants.UNIFIED_ORDER_URL, WXPayUtil.mapToXml(unifiedOrderData));
             if (unifiedOrderResult != null) {
