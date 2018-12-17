@@ -16,7 +16,7 @@ public class WeixinXcxConfig extends WeixinBaseConfig {
 
     public WeixinXcxConfig() {}
 
-    public WeixinXcxConfig(String appId, String appSecret, String baseUrl, String loginRedirectUrl) {
+    public WeixinXcxConfig(String appId, String appSecret, String baseUrl) {
         super(baseUrl);
         this.appId = appId;
         this.appSecret = appSecret;
