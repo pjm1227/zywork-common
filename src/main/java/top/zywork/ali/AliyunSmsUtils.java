@@ -24,31 +24,29 @@ public class AliyunSmsUtils {
     private static final String product = "Dysmsapi";
     private static final String domain = "dysmsapi.aliyuncs.com";
 
-    private static final String accessKeyId = "yourAccessKeyId";
-    private static final String accessKeySecret = "yourAccessKeySecret";
-
     /**
      * 发送短信
+     * @param aliyunSmsConfig 阿里云短信发送配置对象
      * @param phoneNumbers 必填:待发送手机号，使用,隔开
-     * @param signName 必填:短信签名-可在短信控制台中找到
      * @param templateCode 必填:短信模板-可在短信控制台中找到
      * @param templateParam 可选:模板中的变量替换JSON串,如模板内容为"亲爱的${name},您的验证码为${code}"时,此处的值为"{\"name\":\"Tom\", \"code\":\"123\"}"
      * @param outId 可选:outId为提供给业务方扩展字段,最终在短信回执消息中将此值带回给调用者
      * @return
      * @throws ClientException
      */
-    public static SendSmsResponse sendSms(String phoneNumbers, String signName, String templateCode, String templateParam, String outId) throws ClientException {
+    public static SendSmsResponse sendSms(AliyunSmsConfig aliyunSmsConfig, String phoneNumbers, String templateCode, String templateParam, String outId) throws ClientException {
         //可自助调整超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
         System.setProperty("sun.net.client.defaultReadTimeout", "10000");
         //初始化acsClient,暂不支持region化
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", aliyunSmsConfig.getAccessKeyId(), aliyunSmsConfig.getAccessKeySecret());
         DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
         IAcsClient acsClient = new DefaultAcsClient(profile);
         //组装请求对象-具体描述见控制台-文档部分内容
         SendSmsRequest request = new SendSmsRequest();
         request.setPhoneNumbers(phoneNumbers);
-        request.setSignName(signName);
+        // 必填:短信签名-可在短信控制台中找到
+        request.setSignName(aliyunSmsConfig.getSignName());
         request.setTemplateCode(templateCode);
         if (StringUtils.isNotEmpty(templateParam)) {
             request.setTemplateParam(templateParam);
@@ -65,6 +63,7 @@ public class AliyunSmsUtils {
 
     /**
      * 查询发送详情
+     * @param aliyunSmsConfig 阿里云短信发送配置对象
      * @param phoneNumber 必填-号码
      * @param bizId 可选-流水号
      * @param date 必填-发送日期 支持30天内记录查询，格式yyyyMMdd
@@ -73,12 +72,12 @@ public class AliyunSmsUtils {
      * @return
      * @throws ClientException
      */
-    public static QuerySendDetailsResponse querySendDetails(String phoneNumber, String bizId, String date, Long pageNo, Long pageSize) throws ClientException {
+    public static QuerySendDetailsResponse querySendDetails(AliyunSmsConfig aliyunSmsConfig, String phoneNumber, String bizId, String date, Long pageNo, Long pageSize) throws ClientException {
         //可自助调整超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
         System.setProperty("sun.net.client.defaultReadTimeout", "10000");
         //初始化acsClient,暂不支持region化
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", aliyunSmsConfig.getAccessKeyId(), aliyunSmsConfig.getAccessKeySecret());
         DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
         IAcsClient acsClient = new DefaultAcsClient(profile);
         //组装请求对象
@@ -96,9 +95,9 @@ public class AliyunSmsUtils {
     }
 
     public static void main(String[] args) throws ClientException, InterruptedException {
-
+        AliyunSmsConfig aliyunSmsConfig = new AliyunSmsConfig("accessKeyId", "accessKeySecret", "signName");
         //发短信
-        SendSmsResponse response = sendSms("15000000000", "赣州智悦科技", "SMS_1000000",
+        SendSmsResponse response = sendSms(aliyunSmsConfig,"15000000000", "SMS_1000000",
                 "{\"name\":\"Tom\", \"code\":\"123\"}", null);
         System.out.println("短信接口返回的数据----------------");
         System.out.println("Code=" + response.getCode());
@@ -110,7 +109,7 @@ public class AliyunSmsUtils {
 
         //查明细
         if(response.getCode() != null && response.getCode().equals("OK")) {
-            QuerySendDetailsResponse querySendDetailsResponse = querySendDetails("15000000000", response.getBizId(),
+            QuerySendDetailsResponse querySendDetailsResponse = querySendDetails(aliyunSmsConfig, "15000000000", response.getBizId(),
                     "20181210", 1L, 15L);
             System.out.println("短信明细查询接口返回数据----------------");
             System.out.println("Code=" + querySendDetailsResponse.getCode());

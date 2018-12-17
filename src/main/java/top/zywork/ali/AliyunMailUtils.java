@@ -19,12 +19,10 @@ import com.aliyuncs.profile.IClientProfile;
  */
 public class AliyunMailUtils {
 
-    private static final String accessKeyId = "yourAccessKeyId";
-    private static final String accessKeySecret = "yourAccessKeySecret";
-
     /**
      * 使用阿里云邮件推送api单个发送邮件
      *
+     * @param aliyunMailConfig 阿里云邮件推送配置对象
      * @param accountName    控制台创建的发信地址
      * @param fromAlias      发信人昵称
      * @param toAddress      收件人地址，可以给多个收件人发送邮件，收件人之间用逗号分开
@@ -35,9 +33,9 @@ public class AliyunMailUtils {
      * @return
      * @throws ClientException
      */
-    public static SingleSendMailResponse sendEmail(String accountName, String fromAlias, String toAddress, boolean applyToAddress, String subject, String htmlBody, String tagName) throws ClientException {
+    public static SingleSendMailResponse sendEmail(AliyunMailConfig aliyunMailConfig, String accountName, String fromAlias, String toAddress, boolean applyToAddress, String subject, String htmlBody, String tagName) throws ClientException {
         // 如果是除杭州region外的其它region（如新加坡、澳洲Region），需要将下面的"cn-hangzhou"替换为"ap-southeast-1"、或"ap-southeast-2"。
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", aliyunMailConfig.getAccessKeyId(), aliyunMailConfig.getAccessKeySecret());
         // 如果是除杭州region外的其它region（如新加坡region）， 需要做如下处理
         //try {
         //DefaultProfile.addEndpoint("dm.ap-southeast-1.aliyuncs.com", "ap-southeast-1", "Dm",  "dm.ap-southeast-1.aliyuncs.com");
@@ -65,6 +63,7 @@ public class AliyunMailUtils {
     /**
      * 使用阿里云邮件推送api批量发送模板邮件，需要在阿里云控制台设置好模板，接收人列表
      *
+     * @param aliyunMailConfig 阿里云邮件推送配置对象
      * @param accountName   控制台创建的发信地址
      * @param templateName  模板名称
      * @param receiversName 接收列表名称
@@ -72,9 +71,9 @@ public class AliyunMailUtils {
      * @return
      * @throws ClientException
      */
-    public static BatchSendMailResponse batchSendEmail(String accountName, String templateName, String receiversName, String tagName) throws ClientException {
+    public static BatchSendMailResponse batchSendEmail(AliyunMailConfig aliyunMailConfig, String accountName, String templateName, String receiversName, String tagName) throws ClientException {
         // 如果是除杭州region外的其它region（如新加坡、澳洲Region），需要将下面的"cn-hangzhou"替换为"ap-southeast-1"、或"ap-southeast-2"。
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", aliyunMailConfig.getAccessKeyId(), aliyunMailConfig.getAccessKeySecret());
         // 如果是除杭州region外的其它region（如新加坡region）， 需要做如下处理
         //try {
         //DefaultProfile.addEndpoint("dm.ap-southeast-1.aliyuncs.com", "ap-southeast-1", "Dm",  "dm.ap-southeast-1.aliyuncs.com");
