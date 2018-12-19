@@ -94,28 +94,34 @@ public abstract class AbstractBaseService implements BaseService {
     }
 
     @Override
-    public List<Object> listById(Serializable id) {
+    public PagerDTO listById(Serializable id) {
+        PagerDTO pagerDTO = new PagerDTO();
         try {
             List<Object> doObjList = baseDAO.listById(id);
             List<Object> dtoObjList = new ArrayList<>();
             if (doObjList != null && doObjList.size() > 0) {
                 dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
             }
-            return dtoObjList;
+            pagerDTO.setRows(dtoObjList);
+            pagerDTO.setTotal((long) dtoObjList.size());
+            return pagerDTO;
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
     }
 
     @Override
-    public List<Object> listAll() {
+    public PagerDTO listAll() {
+        PagerDTO pagerDTO = new PagerDTO();
         try {
             List<Object> doObjList = baseDAO.listAll();
             List<Object> dtoObjList = new ArrayList<>();
             if (doObjList != null && doObjList.size() > 0) {
                 dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
             }
-            return dtoObjList;
+            pagerDTO.setRows(dtoObjList);
+            pagerDTO.setTotal((long) dtoObjList.size());
+            return pagerDTO;
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }

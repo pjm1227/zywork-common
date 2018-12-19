@@ -63,15 +63,15 @@ public interface BaseService {
     /**
      * 根据主体表id查找数据，针对关联表查询
      * @param id 主体表主键字段值
-     * @return 关联数据的记录对应的DTO集合
+     * @return 关联数据的记录所组成的PagerDTO
      */
-    List<Object> listById(Serializable id);
+    PagerDTO listById(Serializable id);
 
     /**
      * 查找所有记录数据
-     * @return DTO数据传输对象组成的List列表
+     * @return DTO数据传输对象组成的PagerDTO
      */
-    List<Object> listAll();
+    PagerDTO listAll();
     
     /**
      * 根据分页查询对象和条件查询对象查找数据
