@@ -1,5 +1,9 @@
 package top.zywork.enums;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 用户提现状态的枚举<br/>
  * 创建于2018-12-23<br/>
@@ -18,6 +22,15 @@ public enum WithdrawStatusEnum {
 
     private Integer value;
     private String des;
+
+    public static Map<Integer, WithdrawStatusEnum> lookup;
+
+    static {
+        lookup = new HashMap<>();
+        for (WithdrawStatusEnum withdrawStatusEnum : EnumSet.allOf(WithdrawStatusEnum.class)) {
+            lookup.put(withdrawStatusEnum.getValue(), withdrawStatusEnum);
+        }
+    }
 
     WithdrawStatusEnum(Integer value, String des) {
         this.value = value;
@@ -38,5 +51,9 @@ public enum WithdrawStatusEnum {
 
     public void setDes(String des) {
         this.des = des;
+    }
+
+    public static WithdrawStatusEnum findByValue(Integer value) {
+        return lookup.get(value);
     }
 }
