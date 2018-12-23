@@ -20,4 +20,10 @@ public @interface SysLog {
      */
     String description() default "";
 
+    /**
+     * 用于描述是否保存请求参数
+     * @return
+     */
+    boolean requestParams() default true;
+
 }
