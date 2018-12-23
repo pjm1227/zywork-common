@@ -14,6 +14,7 @@ public enum FundsChangeTypeEnum {
     RECHARGE_WXPAY("微信充值"),
     RECHARGE_ALIPAY("支付宝充值"),
     RECHARGE_UNIONPAY("银联充值"),
+    RECHARGE_HUMAN("人工充值"),
     WITHDRAW("提现"),
     TRANSFER_IN("转入"),
     TRANSFER_OUT("转出"),
