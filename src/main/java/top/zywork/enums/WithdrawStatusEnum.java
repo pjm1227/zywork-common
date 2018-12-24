@@ -17,8 +17,9 @@ public enum WithdrawStatusEnum {
     CHECKING(0, "审核中"),
     CHECKED(1, "已通过"),
     UNCHECKED(2, "未通过"),
-    SUCCESS(3, "成功"),
-    FAILURE(4, "失败");
+    CANCELED(3, "已取消"),
+    SUCCESS(4, "成功"),
+    FAILURE(5, "失败");
 
     private Integer value;
     private String des;
