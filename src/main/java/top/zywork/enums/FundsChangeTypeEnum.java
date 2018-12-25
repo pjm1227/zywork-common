@@ -19,7 +19,11 @@ public enum FundsChangeTypeEnum {
     TRANSFER_IN("转入"),
     TRANSFER_OUT("转出"),
     FREZEE("冻结"),
-    UNFREZEE("解冻");
+    UNFREZEE("解冻"),
+    CONSUME("消费"),
+    REFUND("还款"),
+    OTHER_IN("其他收入"),
+    OTHER_OUT("其他支出");
 
     private String value;
 
