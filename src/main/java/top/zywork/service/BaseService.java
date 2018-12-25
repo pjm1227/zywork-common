@@ -2,7 +2,6 @@ package top.zywork.service;
 
 
 import top.zywork.dto.PagerDTO;
-import top.zywork.query.PageQuery;
 
 import java.io.Serializable;
 import java.util.List;
@@ -20,38 +19,45 @@ public interface BaseService {
     /**
      * 添加数据到数据库中
      * @param dataTransferObj DTO数据传输对象
+     * @return 返回插入的行数
      */
-    void save(Object dataTransferObj);
+    int save(Object dataTransferObj);
 
     /**
      * 批量添加数据到数据库中
      * @param dataTransferObjList DTO数据传输对象集合
+     * @return 返回插入的行数
      */
-    void saveBatch(List<Object> dataTransferObjList);
+    int saveBatch(List<Object> dataTransferObjList);
 
     /**
      * 根据主键从数据库中删除数据
      * @param id 主键ID
+     * @return 返回删除的行数
      */
-    void removeById(Serializable id);
+    int removeById(Serializable id);
 
     /**
      * 根据多个主键批量删除数据
      * @param ids 多个主键组成的数组
+     * @return 返回删除的行数
      */
-    void removeByIds(Serializable[] ids);
+    int removeByIds(Serializable[] ids);
 
     /**
-     * 根据对象更新数据库中的数据
+     * 根据对象更新数据库中的数据<br/>
+     * 为了保证在高并发状态下的数据正确性，使用了version版本号乐观锁机制来控制数据的更新<br/>
      * @param dataTransferObj DTO数据传输对象
+     * @return 返回更新的行数。如果数据与原先的记录数据一致，则不更新，返回0；如果版本号小于等于数据库中的版本号，也不更新，返回0
      */
-    void update(Object dataTransferObj);
+    int update(Object dataTransferObj);
 
     /**
      * 根据对象集合批量更新数据库中的数据
      * @param dataTransferObjList DTO数据传输对象集合
+     * @return 返回更新的行数
      */
-    void updateBatch(List<Object> dataTransferObjList);
+    int updateBatch(List<Object> dataTransferObjList);
 
     /**
      * 根据主键id查找数据
@@ -59,6 +65,13 @@ public interface BaseService {
      * @return DTO数据传输对象
      */
     Object getById(Serializable id);
+
+    /**
+     * 根据主键获取记录版本号
+     * @param id 主键字段值
+     * @return 记录版本号
+     */
+    Integer getVersionById(Serializable id);
 
     /**
      * 根据主体表id查找数据，针对关联表查询

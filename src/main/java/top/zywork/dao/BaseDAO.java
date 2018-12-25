@@ -16,38 +16,44 @@ public interface BaseDAO {
     /**
      * 添加数据到数据库中
      * @param dataObj DO实体类
+     * @return 返回插入的行数
      */
-    void save(Object dataObj);
+    int save(Object dataObj);
 
     /**
      * 批量添加数据到数据库中
      * @param dataObjList DO实体类集合
+     * @return 返回插入的行数
      */
-    void saveBatch(List<Object> dataObjList);
+    int saveBatch(List<Object> dataObjList);
 
     /**
      * 根据主键从数据库中删除数据
      * @param id 主键ID
+     * @return 返回删除的行数
      */
-    void removeById(Serializable id);
+    int removeById(Serializable id);
 
     /**
      * 根据多个主键批量删除数据
      * @param ids 多个主键组成的数组
+     * @return 返回删除的行数
      */
-    void removeByIds(Serializable[] ids);
+    int removeByIds(Serializable[] ids);
 
     /**
      * 根据对象更新数据库中的数据
      * @param dataObj DO实体类
+     * @return 返回更新的行数
      */
-    void update(Object dataObj);
+    int update(Object dataObj);
 
     /**
      * 根据对象集合批量更新数据库中的数据
      * @param dataObjList DO实体类集合
+     * @return 返回更新的行数
      */
-    void updateBatch(List<Object> dataObjList);
+    int updateBatch(List<Object> dataObjList);
 
     /**
      * 根据主键id查找数据，针对单表查询
@@ -55,6 +61,13 @@ public interface BaseDAO {
      * @return 主键字段对应记录的DO对象
      */
     Object getById(Serializable id);
+
+    /**
+     * 根据主键获取记录版本号
+     * @param id 主键字段值
+     * @return 记录版本号
+     */
+    Integer getVersionById(Serializable id);
 
     /**
      * 根据主体表id查找数据，针对关联表查询

@@ -65,6 +65,7 @@ public class ReflectUtils {
         Class clazz = obj.getClass();
         try {
             Field field = clazz.getDeclaredField(property);
+            field.setAccessible(true);
             return field.get(obj);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             logger.error("reflect get property value error: {}", e.getMessage());

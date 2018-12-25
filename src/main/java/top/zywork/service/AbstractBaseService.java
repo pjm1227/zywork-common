@@ -2,6 +2,7 @@ package top.zywork.service;
 
 import top.zywork.common.BeanUtils;
 import top.zywork.common.ExceptionUtils;
+import top.zywork.common.ReflectUtils;
 import top.zywork.dao.BaseDAO;
 import top.zywork.dto.PagerDTO;
 
@@ -26,54 +27,59 @@ public abstract class AbstractBaseService implements BaseService {
     private Class<?> dtoClass;
 
     @Override
-    public void save(Object dataTransferObj) {
+    public int save(Object dataTransferObj) {
         try {
-            baseDAO.save(BeanUtils.copy(dataTransferObj, doClass));
+            return baseDAO.save(BeanUtils.copy(dataTransferObj, doClass));
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
     }
 
     @Override
-    public void saveBatch(List<Object> dataTransferObjList) {
+    public int saveBatch(List<Object> dataTransferObjList) {
         try {
-            baseDAO.saveBatch(BeanUtils.copyList(dataTransferObjList, doClass));
+            return baseDAO.saveBatch(BeanUtils.copyList(dataTransferObjList, doClass));
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
     }
 
     @Override
-    public void removeById(Serializable id) {
+    public int removeById(Serializable id) {
         try {
-            baseDAO.removeById(id);
+            return baseDAO.removeById(id);
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
     }
 
     @Override
-    public void removeByIds(Serializable[] ids) {
+    public int removeByIds(Serializable[] ids) {
         try {
-            baseDAO.removeByIds(ids);
+            return baseDAO.removeByIds(ids);
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
     }
 
     @Override
-    public void update(Object dataTransferObj) {
+    public int update(Object dataTransferObj) {
         try {
-            baseDAO.update(BeanUtils.copy(dataTransferObj, doClass));
+            Object idObj = ReflectUtils.getPropertyValue(dataTransferObj, "id");
+            Serializable id = idObj instanceof Long ? (Long) idObj : idObj instanceof Integer ? (Integer) idObj : idObj instanceof String ? (String) idObj : 0;
+            Integer version = baseDAO.getVersionById(id);
+            version = version == null ? 1 : version;
+            ReflectUtils.setPropertyValue(dataTransferObj, "version", version + 1);
+            return baseDAO.update(BeanUtils.copy(dataTransferObj, doClass));
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
     }
 
     @Override
-    public void updateBatch(List<Object> dataTransferObjList) {
+    public int updateBatch(List<Object> dataTransferObjList) {
         try {
-            baseDAO.updateBatch(BeanUtils.copyList(dataTransferObjList, doClass));
+            return baseDAO.updateBatch(BeanUtils.copyList(dataTransferObjList, doClass));
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
@@ -88,6 +94,15 @@ public abstract class AbstractBaseService implements BaseService {
                 dtoObject = BeanUtils.copy(doObject, dtoClass);
             }
             return dtoObject;
+        } catch (RuntimeException e) {
+            throw ExceptionUtils.serviceException(e);
+        }
+    }
+
+    @Override
+    public Integer getVersionById(Serializable id) {
+        try {
+            return baseDAO.getVersionById(id);
         } catch (RuntimeException e) {
             throw ExceptionUtils.serviceException(e);
         }
