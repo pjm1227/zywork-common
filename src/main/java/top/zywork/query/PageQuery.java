@@ -32,7 +32,7 @@ public class PageQuery extends BaseQuery {
     }
 
     public Integer getPageNo() {
-        return pageNo;
+        return pageNo > 0 ? pageNo : 1;
     }
 
     public void setPageNo(Integer pageNo) {
@@ -40,7 +40,7 @@ public class PageQuery extends BaseQuery {
     }
 
     public Integer getPageSize() {
-        return pageSize;
+        return pageSize > 0 ? pageSize : DEFAULT_PAGE_SIZE;
     }
 
     public void setPageSize(Integer pageSize) {
@@ -48,7 +48,7 @@ public class PageQuery extends BaseQuery {
     }
 
     public int getBeginIndex() {
-        return (pageNo - 1) * pageSize;
+        return ((pageNo > 0 ? pageNo : 1) - 1) * (pageSize > 0 ? pageSize : DEFAULT_PAGE_SIZE);
     }
 
     public String getSortColumn() {
