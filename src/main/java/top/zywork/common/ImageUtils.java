@@ -5,8 +5,13 @@ import org.slf4j.LoggerFactory;
 import top.zywork.enums.MIMETypeEnum;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Iterator;
 
 /**
  * 图片处理相关工具类<br/>
@@ -208,4 +213,74 @@ public class ImageUtils {
             logger.error("save image to path {} with type {} error: {}", imagePath, imageType.getValue(), e.getMessage());
         }
     }
+
+    /**
+     * 从指定的图片url获取图片InputStream
+     * @param urlString
+     * @return
+     */
+    public static InputStream getInputStreamFromUrl(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            return urlConnection.getInputStream();
+        } catch (IOException e) {
+            logger.error("get image input stream from url error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 从指定的图片url获取BufferedImage
+     * @param urlString
+     * @return
+     */
+    public static BufferedImage getBufferedImageFromUrl(String urlString) {
+        try {
+            return ImageIO.read(new URL(urlString));
+        } catch (IOException e) {
+            logger.error("get buffered image from url error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 根据图片输入流获取图片格式，如jpg, png，gif等
+     * @param inputStream
+     * @return
+     */
+    public static String getImageFormat(InputStream inputStream) {
+        try {
+            ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream);
+            Iterator<ImageReader> iterator = ImageIO.getImageReaders(imageInputStream);
+            while (iterator.hasNext()) {
+                ImageReader reader = iterator.next();
+                return reader.getFormatName();
+            }
+        } catch (IOException e) {
+            logger.error("get image format from input stream error: {}", e.getMessage());
+        }
+        return null;
+    }
+    /**
+     * 根据图片输入流获取图片类型枚举
+     * @param inputStream
+     * @return
+     */
+    public static MIMETypeEnum getImageTypeEnum(InputStream inputStream) {
+        String type = getImageFormat(inputStream);
+        if (type != null) {
+            if (MIMETypeEnum.JPEG.getValue().equalsIgnoreCase(type)) {
+                return MIMETypeEnum.JPEG;
+            } else if (MIMETypeEnum.PNG.getValue().equalsIgnoreCase(type)) {
+                return MIMETypeEnum.PNG;
+            } else if (MIMETypeEnum.GIF.getValue().equalsIgnoreCase(type)) {
+                return MIMETypeEnum.GIF;
+            } else if (MIMETypeEnum.BMP.getValue().equalsIgnoreCase(type)) {
+                return MIMETypeEnum.BMP;
+            }
+        }
+        return null;
+    }
+
 }
