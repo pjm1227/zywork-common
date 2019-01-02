@@ -2,6 +2,7 @@ package top.zywork.common;
 
 import top.zywork.constant.BPMNConstants;
 import top.zywork.constant.FileConstants;
+import top.zywork.enums.DatePatternEnum;
 
 import java.io.File;
 
@@ -68,7 +69,7 @@ public class FileUtils {
      * @return 文件后缀，包括.符号，如.png
      */
     public static String getFullExt(String fileName) {
-        return fileName.substring(fileName.lastIndexOf("."));
+        return fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
     }
 
     /**
@@ -77,7 +78,7 @@ public class FileUtils {
      * @return 文件后缀，不包括.符号，如png
      */
     public static String getExt(String filename) {
-        return filename.substring(filename.lastIndexOf(".") + 1);
+        return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
     }
 
     /**
@@ -87,7 +88,8 @@ public class FileUtils {
      * @return 如果文件名符合给定的后缀，则返回true，否则返回false
      */
     public static boolean checkExt(String fileName, String extensions) {
-        String[] exts = extensions.split(",");
+        String[] exts = extensions.toLowerCase().split(",");
+        fileName = fileName.toLowerCase();
         for (String ext : exts) {
             if (fileName.endsWith(ext)) {
                 return true;
@@ -112,7 +114,7 @@ public class FileUtils {
      * @return 去除后缀的文件名
      */
     public static String getFileNameWithoutExt(String filename, String extension) {
-        return filename.substring(0, filename.lastIndexOf(extension));
+        return filename.substring(0, filename.toLowerCase().lastIndexOf(extension.toLowerCase()));
     }
 
     /**
@@ -167,6 +169,15 @@ public class FileUtils {
         file.delete();
     }
 
+    /**
+     * 基于时间格式获取新文件名
+     * @param fileName 旧文件名
+     * @return
+     */
+    public static String newFileName(String fileName) {
+        return DateFormatUtils.format(DateUtils.currentTimeMillis(), DatePatternEnum.DATETIME_SIMPLE.getValue())
+                + "" + RandomUtils.randomNum(10000, 99999) + getFullExt(fileName).toLowerCase();
+    }
 
     /**
      * 获取src根目录下的bpmn目录路径

@@ -16,7 +16,8 @@ public enum DatePatternEnum {
     FULL_ZH("yyyy年MM月dd日 HH时mm分ss秒SSS毫秒"),
     DATETIME_ZH("yyyy年MM月dd日 HH时mm分ss秒"),
     DATE_ZH("yyyy年MM月dd日"),
-    TIME_ZH("HH时mm分ss秒");
+    TIME_ZH("HH时mm分ss秒"),
+    DATETIME_SIMPLE("yyyyMMddHHmmss");
 
     private String value;
 
