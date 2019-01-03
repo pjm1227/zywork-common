@@ -93,4 +93,11 @@ public interface BaseService {
      */
     PagerDTO listPageByCondition(Object queryObj);
 
+    /**
+     * 根据条件查询对象计数
+     * @param queryObj 条件查询对象
+     * @return 按照条件查询对象的记录数
+     */
+    Long countByCondition(Object queryObj);
+
 }

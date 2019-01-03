@@ -160,6 +160,11 @@ public abstract class AbstractBaseService implements BaseService {
         }
     }
 
+    @Override
+    public Long countByCondition(Object queryObj) {
+        return baseDAO.countByCondition(queryObj);
+    }
+
     public void setBaseDAO(BaseDAO baseDAO) {
         this.baseDAO = baseDAO;
     }
