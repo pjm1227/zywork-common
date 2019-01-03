@@ -4,11 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 import top.zywork.enums.MIMETypeEnum;
+import top.zywork.enums.ResponseStatusEnum;
+import top.zywork.vo.ResponseStatusVO;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 文件上传工具类，上传到本地服务器<br/>
@@ -33,14 +37,17 @@ public class UploadUtils {
      * @param compressScales 指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static String upload(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+    public static ResponseStatusVO upload(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+        ResponseStatusVO statusVO = new ResponseStatusVO();
         String fileName = file.getOriginalFilename();
         long fileSize = file.getSize();
         if (fileSize > maxSize) {
-            return "超过最大文件限制，最大大小：" + maxSize + "MB";
+            statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "超过最大文件限制，最大大小：" + maxSize + "MB", null);
+            return statusVO;
         }
         if (!FileUtils.checkExt(fileName, allowedExts)) {
-            return "文件类型错误，后缀只能是：" + allowedExts;
+            statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "文件类型错误，后缀只能是：" + allowedExts, null);
+            return statusVO;
         }
         return save(file, fileName, uploadParentDir, uploadDir, compressSizes, compressScales);
     }
@@ -56,16 +63,19 @@ public class UploadUtils {
      * @param compressScales 指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static String upload(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+    public static ResponseStatusVO upload(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+        ResponseStatusVO statusVO = new ResponseStatusVO();
         for (int i = 0, len = files.length; i < len; i++) {
             MultipartFile file = files[i];
             String fileName = file.getOriginalFilename();
             long fileSize = file.getSize();
             if (fileSize > maxSize) {
-                return "第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize + "MB";
+                statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize + "MB", null);
+                return statusVO;
             }
             if (!FileUtils.checkExt(fileName, allowedExts)) {
-                return "第" + (i + 1) + "个文件类型错误，后缀只能是：" + allowedExts;
+                statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "第" + (i + 1) + "个文件类型错误，后缀只能是：" + allowedExts, null);
+                return statusVO;
             }
             return save(file, fileName, uploadParentDir, uploadDir, compressSizes, compressScales);
         }
@@ -81,43 +91,51 @@ public class UploadUtils {
      * @param compressSizes
      * @return
      */
-    private static String save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+    private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+        ResponseStatusVO statusVO = new ResponseStatusVO();
+        List<String> uploadFileNames = new ArrayList<>();
         String saveDir = FileUtils.mkdirs(uploadParentDir, uploadDir);
         try {
             String newFileName = FileUtils.newFileNameWithoutExt(fileName);
             String fullExt = FileUtils.getFullExt(fileName);
             File newFile = new File(saveDir, newFileName + fullExt);
             file.transferTo(newFile);
+            uploadFileNames.add(newFileName + fullExt);
             if (compressSizes != null) {
                 // 需要按指定大小压缩
                 for (int[] size : compressSizes) {
-                    String newFilePath = saveDir + File.separator + newFileName + "_" + size[0] + "x" + size[1] + fullExt;
-                    if (FileUtils.checkExt(fileName, ".gif")) {
+                    String uploadFileName = uploadFileName(newFileName, fullExt, size);
+                    String newFilePath = saveDir + File.separator + uploadFileName;
+                    if (MIMETypeEnum.GIF.getExt().equalsIgnoreCase(fullExt)) {
                         // 压缩gif图片
                         ImageCompressUtils.compressGif(newFile.getAbsolutePath(), size[0], size[1], new FileOutputStream(new File(newFilePath)));
                     } else {
                         BufferedImage bufferedImage = ImageCompressUtils.compress(newFile.getAbsolutePath(), size[0], size[1]);
                         ImageUtils.saveImage(bufferedImage, newFilePath, MIMETypeEnum.findByValue(FileUtils.getExt(fileName)));
                     }
+                    uploadFileNames.add(uploadFileName);
                 }
             } else if (compressScales != null) {
                 // 需要按指定比例压缩
                 for (float scale : compressScales) {
-                    String newFilePath = saveDir + File.separator + newFileName + "_" + (int) (scale * 10) + fullExt;
-                    if (FileUtils.checkExt(fileName, ".gif")) {
+                    String uploadFileName = uploadFileName(newFileName, fullExt, scale);
+                    String newFilePath = saveDir + File.separator + uploadFileName;
+                    if (MIMETypeEnum.GIF.getExt().equalsIgnoreCase(fullExt)) {
                         // 压缩gif图片
                         ImageCompressUtils.compressGif(newFile.getAbsolutePath(), scale, new FileOutputStream(new File(newFilePath)));
                     } else {
                         BufferedImage bufferedImage = ImageCompressUtils.compress(newFile.getAbsolutePath(), scale);
                         ImageUtils.saveImage(bufferedImage, newFilePath, MIMETypeEnum.findByValue(FileUtils.getExt(fileName)));
                     }
+                    uploadFileNames.add(uploadFileName);
                 }
             }
+            statusVO.okStatus(ResponseStatusEnum.OK.getCode(), "成功上传文件", uploadFileNames);
         } catch (IOException e) {
             logger.error("save upload file error: {}", e.getMessage());
-            return "文件上传错误，稍候再试";
+            statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "文件上传错误，稍候再试", null);
         }
-        return null;
+        return statusVO;
     }
 
     /**
@@ -130,7 +148,7 @@ public class UploadUtils {
      * @param compressSizes 指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
      * @return
      */
-    public static String uploadImg(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes) {
+    public static ResponseStatusVO uploadImg(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes) {
         return upload(file, allowedExts, maxSize, uploadParentDir, uploadDir, compressSizes, null);
     }
 
@@ -144,7 +162,7 @@ public class UploadUtils {
      * @param compressScales 指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static String uploadImg(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, float[] compressScales) {
+    public static ResponseStatusVO uploadImg(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, float[] compressScales) {
         return upload(file, allowedExts, maxSize, uploadParentDir, uploadDir, null, compressScales);
     }
 
@@ -158,7 +176,7 @@ public class UploadUtils {
      * @param compressSizes 指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
      * @return
      */
-    public static String uploadImgs(MultipartFile[] files, String allowedExts, int maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes) {
+    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String allowedExts, int maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes) {
         return upload(files, allowedExts, maxSize, uploadParentDir, uploadDir, compressSizes, null);
     }
 
@@ -172,7 +190,7 @@ public class UploadUtils {
      * @param compressScales 指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static String uploadImgs(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, float[] compressScales) {
+    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, float[] compressScales) {
         return upload(files, allowedExts, maxSize, uploadParentDir, uploadDir, null, compressScales);
     }
 
@@ -185,7 +203,7 @@ public class UploadUtils {
      * @param uploadDir 上传子目录，可以带有下级目录
      * @return
      */
-    public static String uploadFile(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir) {
+    public static ResponseStatusVO uploadFile(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir) {
         return upload(file, allowedExts, maxSize, uploadParentDir, uploadDir, null, null);
     }
 
@@ -198,8 +216,16 @@ public class UploadUtils {
      * @param uploadDir 上传子目录，可以带有下级目录
      * @return
      */
-    public static String uploadFiles(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir) {
+    public static ResponseStatusVO uploadFiles(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir) {
         return upload(files, allowedExts, maxSize, uploadParentDir, uploadDir, null, null);
+    }
+
+    private static String uploadFileName(String fileNameWithoutExt, String fullExt, int[] size) {
+        return fileNameWithoutExt + "_" + size[0] + "x" + size[1] + fullExt;
+    }
+
+    private static String uploadFileName(String fileNameWithoutExt, String fullExt, float scale) {
+        return fileNameWithoutExt + "_" + (int) (scale * 10) + fullExt;
     }
 
 }
