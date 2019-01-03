@@ -170,13 +170,23 @@ public class FileUtils {
     }
 
     /**
-     * 基于时间格式获取新文件名
+     * 基于时间格式获取新文件名，包括文件扩展名
      * @param fileName 旧文件名
      * @return
      */
     public static String newFileName(String fileName) {
         return DateFormatUtils.format(DateUtils.currentTimeMillis(), DatePatternEnum.DATETIME_SIMPLE.getValue())
                 + "" + RandomUtils.randomNum(10000, 99999) + getFullExt(fileName).toLowerCase();
+    }
+
+    /**
+     * 基于时间格式获取新文件名，但不包括文件扩展名
+     * @param fileName 旧文件名
+     * @return
+     */
+    public static String newFileNameWithoutExt(String fileName) {
+        return DateFormatUtils.format(DateUtils.currentTimeMillis(), DatePatternEnum.DATETIME_SIMPLE.getValue())
+                + "" + RandomUtils.randomNum(10000, 99999);
     }
 
     /**

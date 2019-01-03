@@ -142,6 +142,16 @@ public class IOUtils {
         }
     }
 
+
+    /**
+     * 字节输出流转化为字节输入流
+     * @param byteArrayOutputStream
+     * @return
+     */
+    public static ByteArrayInputStream outputToInput(ByteArrayOutputStream byteArrayOutputStream) {
+        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    }
+
     /**
      * 把JSON文件读入到指定的对象中
      * @param path json文件路径

@@ -1,5 +1,9 @@
 package top.zywork.enums;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * MIME Type枚举，常用的MIME Type<br/>
  * 创建于2017-09-01<br/>
@@ -33,6 +37,15 @@ public enum MIMETypeEnum {
     private String ext;
     private String mime;
 
+    public static Map<String, MIMETypeEnum> valueLookup;
+
+    static {
+        valueLookup = new HashMap<>();
+        for (MIMETypeEnum mimeTypeEnum : EnumSet.allOf(MIMETypeEnum.class)) {
+            valueLookup.put(mimeTypeEnum.getValue(), mimeTypeEnum);
+        }
+    }
+
     MIMETypeEnum(String value, String ext, String mime) {
         this.value = value;
         this.ext = ext;
@@ -61,5 +74,9 @@ public enum MIMETypeEnum {
 
     public void setMime(String mime) {
         this.mime = mime;
+    }
+
+    public static MIMETypeEnum findByValue(String value) {
+        return valueLookup.get(value);
     }
 }
