@@ -14,9 +14,9 @@ public class PageQuery extends BaseQuery {
     private static final int DEFAULT_PAGE_SIZE = 10;
 
     // 第几页
-    private Integer pageNo;
+    private Integer pageNo = 1;
     // 每页多少项
-    private Integer pageSize;
+    private Integer pageSize = DEFAULT_PAGE_SIZE;
     // 排序字段
     private String sortColumn;
     // 排序规则
