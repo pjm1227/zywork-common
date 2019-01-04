@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import top.zywork.enums.CharsetEnum;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * 输入输出工具类<br />
@@ -164,6 +165,17 @@ public class IOUtils {
     }
 
     /**
+     * 把JSON文件读入到指定的对象中，返回List
+     * @param path json文件路径
+     * @param tClass 指定的对象类
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> readJsonFileToList(String path, Class<T> tClass) {
+        return readJsonStrToList(getText(path), tClass);
+    }
+
+    /**
      * 把JSON字符串读入到指定的对象中
      * @param jsonStr json字符中
      * @param tClass 指定的对象类
@@ -172,6 +184,40 @@ public class IOUtils {
      */
     public static <T> T readJsonStrToObject(String jsonStr, Class<T> tClass) {
         return JSON.parseObject(jsonStr, tClass);
+    }
+
+    /**
+     * 把JSON字符串读入到指定的对象中，返回List
+     * @param jsonStr json字符中
+     * @param tClass 指定的对象类
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> readJsonStrToList(String jsonStr, Class<T> tClass) {
+        return JSON.parseArray(jsonStr, tClass);
+    }
+
+
+    /**
+     * 把JSON 输入流读入到指定的对象中
+     * @param inputStream json InputStream
+     * @param tClass 指定的对象类
+     * @param <T>
+     * @return
+     */
+    public static <T> T readJsonInputStreamToObject(InputStream inputStream, Class<T> tClass) {
+        return readJsonStrToObject(getText(inputStream, CharsetEnum.UTF8.getValue()), tClass);
+    }
+
+    /**
+     * 把JSON 输入流读入到指定的对象中，返回List
+     * @param inputStream json InputStream
+     * @param tClass 指定的对象类
+     * @param <T>
+     * @return
+     */
+    public static <T> List<T> readJsonInputStreamToList(InputStream inputStream, Class<T> tClass) {
+        return readJsonStrToList(getText(inputStream, CharsetEnum.UTF8.getValue()), tClass);
     }
 
 }
