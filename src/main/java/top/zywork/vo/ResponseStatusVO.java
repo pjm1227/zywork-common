@@ -14,10 +14,6 @@ public class ResponseStatusVO extends BaseVO {
 
     private static final long serialVersionUID = 4997020566681368159L;
 
-    private static final String STATUS_OK = "ok";
-    private static final String STATUS_ERROR = "error";
-    private static final String STATUS_DATA_ERROR = "data-error";
-
     // 状态码
     private Integer code;
     // 返回消息
@@ -62,8 +58,47 @@ public class ResponseStatusVO extends BaseVO {
      *
      * @param code 状态码
      * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
      */
+    @Deprecated
     public void okStatus(Integer code, String message, Object data) {
+        setCode(code);
+        setMessage(message);
+        setData(data);
+    }
+
+    /**
+     * 获取表示执行成功的结果
+     *
+     * @param code 状态码
+     * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     * @return
+     */
+    public static ResponseStatusVO ok(Integer code, String message, Object data) {
+        return new ResponseStatusVO(code, message, data);
+    }
+
+    /**
+     * 获取表示执行成功的结果
+     *
+     * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     * @return
+     */
+    public static ResponseStatusVO ok(String message, Object data) {
+        return new ResponseStatusVO(ResponseStatusEnum.OK.getCode(), message, data);
+    }
+
+    /**
+     * 获取表示执行失败的结果
+     *
+     * @param code 状态码
+     * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     */
+    @Deprecated
+    public void errorStatus(Integer code, String message, Object data) {
         setCode(code);
         setMessage(message);
         setData(data);
@@ -74,8 +109,33 @@ public class ResponseStatusVO extends BaseVO {
      *
      * @param code 状态码
      * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     * @return
      */
-    public void errorStatus(Integer code, String message, Object data) {
+    public static ResponseStatusVO error(Integer code, String message, Object data) {
+        return new ResponseStatusVO(code, message, data);
+    }
+
+    /**
+     * 获取表示执行失败的结果
+     *
+     * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     * @return
+     */
+    public static ResponseStatusVO error(String message, Object data) {
+        return new ResponseStatusVO(ResponseStatusEnum.ERROR.getCode(), message, data);
+    }
+
+    /**
+     * 获取表示数据错误的结果
+     *
+     * @param code 状态码
+     * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     */
+    @Deprecated
+    public void dataErrorStatus(Integer code, String message, Object data) {
         setCode(code);
         setMessage(message);
         setData(data);
@@ -86,12 +146,38 @@ public class ResponseStatusVO extends BaseVO {
      *
      * @param code 状态码
      * @param message 需要返回到前端页面的提示信息
-     * @return 表示数据错误的结果
+     * @param data 返回数据
+     * @return
      */
-    public void dataErrorStatus(Integer code, String message, Object data) {
-        setCode(code);
-        setMessage(message);
-        setData(data);
+    public static ResponseStatusVO dataError(Integer code, String message, Object data) {
+        return new ResponseStatusVO(code, message, data);
+    }
+
+    /**
+     * 获取表示数据错误的结果
+     *
+     * @param message 需要返回到前端页面的提示信息
+     * @param data 返回数据
+     * @return
+     */
+    public static ResponseStatusVO dataError(String message, Object data) {
+        return new ResponseStatusVO(ResponseStatusEnum.DATA_ERROR.getCode(), message, data);
+    }
+
+    /**
+     * 获取未认证的用户结果
+     * @return
+     */
+    public static ResponseStatusVO authenticationError() {
+        return new ResponseStatusVO(ResponseStatusEnum.AUTHENTICATION_ERROR.getCode(), ResponseStatusEnum.AUTHENTICATION_ERROR.getMessage(), null);
+    }
+
+    /**
+     * 获取未授权的用户结果
+     * @return
+     */
+    public static ResponseStatusVO authorizationError() {
+        return new ResponseStatusVO(ResponseStatusEnum.AUTHORIZATION_ERROR.getCode(), ResponseStatusEnum.AUTHORIZATION_ERROR.getMessage(), null);
     }
 
     @Override
