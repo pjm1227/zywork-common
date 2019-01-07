@@ -5,16 +5,31 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import top.zywork.common.DateUtils;
 import top.zywork.common.HttpUtils;
+import top.zywork.common.IOUtils;
 import top.zywork.common.UUIDUtils;
 import top.zywork.enums.CharsetEnum;
 import top.zywork.enums.ContentTypeEnum;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.AlgorithmParameterSpec;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +42,23 @@ import java.util.Map;
  * @version 1.0
  */
 public class WeixinUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(WeixinUtils.class);
+
+    /**
+     * 从哪个url进入到公众号授权界面
+     * @param appId
+     * @param loginRedirectUrl
+     * @param fromUrl
+     * @param shareCode
+     * @return
+     */
+    public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String fromUrl, String shareCode) {
+        loginRedirectUrl += "?t=" + DateUtils.currentTimeMillis();
+        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(fromUrl) ? "" : "&fromUrl=" + fromUrl);
+        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(shareCode) ? "" : "&shareCode=" + shareCode);
+        return GzhConstants.AUTHORIZE_URL.replace("{APP_ID}", appId).replace("{REDIRECT_URL}", loginRedirectUrl);
+    }
 
     /**
      * 微信公众号授权登录通过code获取access_token和openid
@@ -129,7 +161,7 @@ public class WeixinUtils {
         try {
             data.put("sign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unifiedOrderData error: {}", e.getMessage());
         }
         return data;
     }
@@ -157,7 +189,7 @@ public class WeixinUtils {
                 return WXPayUtil.xmlToMap(unifiedOrderResult);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unifiedOrder error: {}", e.getMessage());
         }
         return null;
     }
@@ -179,7 +211,7 @@ public class WeixinUtils {
         try {
             data.put("paySign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("payDataMap error: {}", e.getMessage());
         }
         return data;
     }
@@ -226,7 +258,7 @@ public class WeixinUtils {
             payResult.setTimeEnd(payResultMap.get("time_end"));
             return payResult;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("payResult error: {}", e.getMessage());
         }
         return null;
     }
@@ -240,7 +272,29 @@ public class WeixinUtils {
         try {
             response.getWriter().write(PayConstants.PAY_NOTIFY_RESULT);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("responsePayNotify error: {}", e.getMessage());
         }
+    }
+
+    /**
+     * 根据sessionKey，加密数据和iv向量解密手机号信息
+     * @param sessionKey
+     * @param encryptedData
+     * @param iv
+     * @return
+     */
+    public static XcxPhone decryptPhoneData(String sessionKey, String encryptedData, String iv) {
+        Base64.Decoder decoder = Base64.getDecoder();
+        AlgorithmParameterSpec ivSpec = new IvParameterSpec(decoder.decode(iv));
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec keySpec = new SecretKeySpec(decoder.decode(sessionKey), "AES");
+            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+            String dataStr = new String(cipher.doFinal(decoder.decode(encryptedData)),CharsetEnum.UTF8.getValue());
+            return IOUtils.readJsonStrToObject(dataStr, XcxPhone.class);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+            logger.error("decryptData error: {}", e.getMessage());
+        }
+        return null;
     }
 }

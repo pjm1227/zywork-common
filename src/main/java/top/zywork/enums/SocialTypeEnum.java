@@ -10,6 +10,8 @@ package top.zywork.enums;
 public enum SocialTypeEnum {
 
     WEIXIN("微信"),
+    WEIXIN_GZH("微信公众号"),
+    WEIXIN_XCX("微信小程序"),
     QQ("QQ"),
     ALIPAY("支付宝");
 
