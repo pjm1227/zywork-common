@@ -1,7 +1,6 @@
 package top.zywork.service;
 
 import top.zywork.common.BeanUtils;
-import top.zywork.common.ExceptionUtils;
 import top.zywork.common.ReflectUtils;
 import top.zywork.dao.BaseDAO;
 import top.zywork.dto.PagerDTO;
@@ -28,136 +27,91 @@ public abstract class AbstractBaseService implements BaseService {
 
     @Override
     public int save(Object dataTransferObj) {
-        try {
-            return baseDAO.save(BeanUtils.copy(dataTransferObj, doClass));
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        return baseDAO.save(BeanUtils.copy(dataTransferObj, doClass));
     }
 
     @Override
     public int saveBatch(List<Object> dataTransferObjList) {
-        try {
-            return baseDAO.saveBatch(BeanUtils.copyList(dataTransferObjList, doClass));
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        return baseDAO.saveBatch(BeanUtils.copyList(dataTransferObjList, doClass));
     }
 
     @Override
     public int removeById(Serializable id) {
-        try {
-            return baseDAO.removeById(id);
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        return baseDAO.removeById(id);
     }
 
     @Override
     public int removeByIds(Serializable[] ids) {
-        try {
-            return baseDAO.removeByIds(ids);
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        return baseDAO.removeByIds(ids);
     }
 
     @Override
     public int update(Object dataTransferObj) {
-        try {
-            Object idObj = ReflectUtils.getPropertyValue(dataTransferObj, "id");
-            Serializable id = idObj instanceof Long ? (Long) idObj : idObj instanceof Integer ? (Integer) idObj : idObj instanceof String ? (String) idObj : 0;
-            Integer version = baseDAO.getVersionById(id);
-            version = version == null ? 1 : version;
-            ReflectUtils.setPropertyValue(dataTransferObj, "version", version + 1);
-            return baseDAO.update(BeanUtils.copy(dataTransferObj, doClass));
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        Object idObj = ReflectUtils.getPropertyValue(dataTransferObj, "id");
+        Serializable id = idObj instanceof Long ? (Long) idObj : idObj instanceof Integer ? (Integer) idObj : idObj instanceof String ? (String) idObj : 0;
+        Integer version = baseDAO.getVersionById(id);
+        version = version == null ? 1 : version;
+        ReflectUtils.setPropertyValue(dataTransferObj, "version", version + 1);
+        return baseDAO.update(BeanUtils.copy(dataTransferObj, doClass));
     }
 
     @Override
     public int updateBatch(List<Object> dataTransferObjList) {
-        try {
-            return baseDAO.updateBatch(BeanUtils.copyList(dataTransferObjList, doClass));
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        return baseDAO.updateBatch(BeanUtils.copyList(dataTransferObjList, doClass));
     }
 
     @Override
     public Object getById(Serializable id) {
-        try {
-            Object doObject = baseDAO.getById(id);
-            Object dtoObject = null;
-            if (doObject != null) {
-                dtoObject = BeanUtils.copy(doObject, dtoClass);
-            }
-            return dtoObject;
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
+        Object doObject = baseDAO.getById(id);
+        if (doObject != null) {
+            return BeanUtils.copy(doObject, dtoClass);
         }
+        return null;
     }
 
     @Override
     public Integer getVersionById(Serializable id) {
-        try {
-            return baseDAO.getVersionById(id);
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
-        }
+        return baseDAO.getVersionById(id);
     }
 
     @Override
     public PagerDTO listById(Serializable id) {
         PagerDTO pagerDTO = new PagerDTO();
-        try {
-            List<Object> doObjList = baseDAO.listById(id);
-            List<Object> dtoObjList = new ArrayList<>();
-            if (doObjList != null && doObjList.size() > 0) {
-                dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
-            }
-            pagerDTO.setRows(dtoObjList);
-            pagerDTO.setTotal((long) dtoObjList.size());
-            return pagerDTO;
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
+        List<Object> doObjList = baseDAO.listById(id);
+        List<Object> dtoObjList = new ArrayList<>();
+        if (doObjList != null && doObjList.size() > 0) {
+            dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
         }
+        pagerDTO.setRows(dtoObjList);
+        pagerDTO.setTotal((long) dtoObjList.size());
+        return pagerDTO;
     }
 
     @Override
     public PagerDTO listAll() {
         PagerDTO pagerDTO = new PagerDTO();
-        try {
-            List<Object> doObjList = baseDAO.listAll();
-            List<Object> dtoObjList = new ArrayList<>();
-            if (doObjList != null && doObjList.size() > 0) {
-                dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
-            }
-            pagerDTO.setRows(dtoObjList);
-            pagerDTO.setTotal((long) dtoObjList.size());
-            return pagerDTO;
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
+        List<Object> doObjList = baseDAO.listAll();
+        List<Object> dtoObjList = new ArrayList<>();
+        if (doObjList != null && doObjList.size() > 0) {
+            dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
         }
+        pagerDTO.setRows(dtoObjList);
+        pagerDTO.setTotal((long) dtoObjList.size());
+        return pagerDTO;
     }
 
     @Override
     public PagerDTO listPageByCondition(Object queryObj) {
         PagerDTO pagerDTO = new PagerDTO();
-        try {
-            Long count = baseDAO.countByCondition(queryObj);
-            pagerDTO.setTotal(count);
-            if (count > 0) {
-                List<Object> doObjList = baseDAO.listPageByCondition(queryObj);
-                pagerDTO.setRows(BeanUtils.copyList(doObjList, dtoClass));
-            } else {
-                pagerDTO.setRows(new ArrayList<>());
-            }
-            return pagerDTO;
-        } catch (RuntimeException e) {
-            throw ExceptionUtils.serviceException(e);
+        Long count = baseDAO.countByCondition(queryObj);
+        pagerDTO.setTotal(count);
+        if (count > 0) {
+            List<Object> doObjList = baseDAO.listPageByCondition(queryObj);
+            pagerDTO.setRows(BeanUtils.copyList(doObjList, dtoClass));
+        } else {
+            pagerDTO.setRows(new ArrayList<>());
         }
+        return pagerDTO;
     }
 
     @Override

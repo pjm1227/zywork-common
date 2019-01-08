@@ -1,6 +1,7 @@
 package top.zywork.common.mail;
 
-import top.zywork.common.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -22,6 +23,8 @@ import java.util.List;
  * @version 1.0
  */
 public class Mail {
+
+	private static final Logger logger = LoggerFactory.getLogger(Mail.class);
 	
 	private MailAccount from;
 	private List<MailAccount> recipients;
@@ -111,7 +114,7 @@ public class Mail {
 				multipart.addBodyPart(attachmentPart);
 			}
 		} catch (MessagingException | UnsupportedEncodingException e) {
-			throw ExceptionUtils.appException(e);
+			logger.error("get multipart error: {}", e.getMessage());
 		}
 		return multipart;
 	}

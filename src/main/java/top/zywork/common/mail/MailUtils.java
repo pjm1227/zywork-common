@@ -1,7 +1,8 @@
 package top.zywork.common.mail;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.zywork.common.ConfigUtils;
-import top.zywork.common.ExceptionUtils;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,6 +22,8 @@ import java.util.Properties;
  * @version 1.0
  */
 public class MailUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger(MailUtils.class);
 
 	/**
 	 * 邮箱用户名，为邮箱地址
@@ -57,7 +60,7 @@ public class MailUtils {
 			transport.sendMessage(msg, msg.getAllRecipients());
 			transport.close();
 		} catch (MessagingException e) {
-			throw ExceptionUtils.appException(e);
+			logger.error("send mail error: {}", e.getMessage());
 		}
 	}
 
