@@ -2,10 +2,13 @@ package top.zywork.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 /**
  * 反射工具类<br/>
@@ -88,6 +91,74 @@ public class ReflectUtils {
         } catch (NoSuchFieldException | IllegalAccessException e) {
             logger.error("reflect set property value error: {}", e.getMessage());
         }
+    }
+
+    /**
+     * 获取指定类、方法名和参数类型的所有参数名
+     * @param clazz
+     * @param methodName
+     * @param parameterTypes
+     * @return 如果无参数，返回null
+     */
+    public static String[] getArgsNames(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        try {
+            Method method = clazz.getDeclaredMethod(methodName, parameterTypes);
+            Parameter[] parameters = method.getParameters();
+            int parameterCount = parameters.length;
+            if (parameterCount == 0) {
+                return null;
+            }
+            String[] argsNames = new String[parameterCount];
+            for (int i = 0; i < parameterCount; i++) {
+                argsNames[i] = parameters[i].getName();
+            }
+            return argsNames;
+        } catch (NoSuchMethodException e) {
+            logger.error("getArgsNames error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取指定类中指定方法名的所有参数名称
+     * @param clazz
+     * @param methodName
+     * @return 如果无参数，返回null
+     */
+    public static String[] getArgsNames(Class<?> clazz, String methodName) {
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.getName().equals(methodName)) {
+                Parameter[] parameters = method.getParameters();
+                int parameterCount = parameters.length;
+                if (parameterCount == 0) {
+                    return null;
+                }
+                String[] argsNames = new String[parameterCount];
+                for (int i = 0; i < parameterCount; i++) {
+                    argsNames[i] = parameters[i].getName();
+                }
+                return argsNames;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 通过spring-core包中相关的类获取指定类中指定方法名的所有参数名
+     * @param clazz
+     * @param methodName
+     * @return
+     */
+    public static String[] getArgsNamesBySpring(Class<?> clazz, String methodName) {
+        ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if (method.getName().equals(methodName)) {
+                return parameterNameDiscoverer.getParameterNames(method);
+            }
+        }
+        return null;
     }
 
 }
