@@ -38,16 +38,13 @@ public class UploadUtils {
      * @return
      */
     public static ResponseStatusVO upload(MultipartFile file, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
-        ResponseStatusVO statusVO = new ResponseStatusVO();
         String fileName = file.getOriginalFilename();
         long fileSize = file.getSize();
         if (fileSize > maxSize) {
-            statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "超过最大文件限制，最大大小：" + maxSize + "MB", null);
-            return statusVO;
+            return ResponseStatusVO.dataError("超过最大文件限制，最大大小：" + maxSize + "MB", null);
         }
         if (!FileUtils.checkExt(fileName, allowedExts)) {
-            statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "文件类型错误，后缀只能是：" + allowedExts, null);
-            return statusVO;
+            return ResponseStatusVO.dataError("文件类型错误，后缀只能是：" + allowedExts, null);
         }
         return save(file, fileName, uploadParentDir, uploadDir, compressSizes, compressScales);
     }
@@ -64,22 +61,26 @@ public class UploadUtils {
      * @return
      */
     public static ResponseStatusVO upload(MultipartFile[] files, String allowedExts, long maxSize, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
-        ResponseStatusVO statusVO = new ResponseStatusVO();
         for (int i = 0, len = files.length; i < len; i++) {
             MultipartFile file = files[i];
             String fileName = file.getOriginalFilename();
             long fileSize = file.getSize();
             if (fileSize > maxSize) {
-                statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize + "MB", null);
-                return statusVO;
+                return ResponseStatusVO.dataError("第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize + "MB", null);
             }
             if (!FileUtils.checkExt(fileName, allowedExts)) {
-                statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "第" + (i + 1) + "个文件类型错误，后缀只能是：" + allowedExts, null);
-                return statusVO;
+                return ResponseStatusVO.dataError("第" + (i + 1) + "个文件类型错误，后缀只能是：" + allowedExts, null);
             }
-            return save(file, fileName, uploadParentDir, uploadDir, compressSizes, compressScales);
         }
-        return null;
+        int errorCount = 0;
+        for (MultipartFile file : files) {
+            ResponseStatusVO statusVO = save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales);
+            if (statusVO.getCode().intValue() == ResponseStatusEnum.DATA_ERROR.getCode()) {
+                errorCount++;
+            }
+        }
+        return ResponseStatusVO.ok(errorCount == 0 ? "所有文件上传成功"
+                : errorCount == files.length ? "所有文件上传失败" : "部分文件上传上传失败，请检查后再次上传", null);
     }
 
     /**
@@ -89,10 +90,10 @@ public class UploadUtils {
      * @param uploadParentDir
      * @param uploadDir
      * @param compressSizes
+     * @param compressScales
      * @return
      */
     private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
-        ResponseStatusVO statusVO = new ResponseStatusVO();
         List<String> uploadFileNames = new ArrayList<>();
         String saveDir = FileUtils.mkdirs(uploadParentDir, uploadDir);
         try {
@@ -130,12 +131,11 @@ public class UploadUtils {
                     uploadFileNames.add(uploadFileName);
                 }
             }
-            statusVO.okStatus(ResponseStatusEnum.OK.getCode(), "成功上传文件", uploadFileNames);
+            return ResponseStatusVO.ok("文件上传成功", uploadFileNames);
         } catch (IOException e) {
             logger.error("save upload file error: {}", e.getMessage());
-            statusVO.dataErrorStatus(ResponseStatusEnum.DATA_ERROR.getCode(), "文件上传错误，稍候再试", null);
+            return ResponseStatusVO.dataError("文件上传错误，稍候再试", null);
         }
-        return statusVO;
     }
 
     /**
