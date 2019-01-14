@@ -56,7 +56,7 @@ public class IOUtils {
             reader = new BufferedReader(new InputStreamReader(inputStream, charsetName));
             String str;
             while ((str = reader.readLine()) != null) {
-                text.append(str);
+                text.append(str).append("\r\n");
             }
         } catch (IOException e) {
             logger.error("read text file from input stream error: {}", e.getMessage());
@@ -79,6 +79,41 @@ public class IOUtils {
      */
     public static String getText(InputStream inputStream) {
         return getText(inputStream, CharsetEnum.UTF8.getValue());
+    }
+
+    /**
+     * 写出文本内容到指定路径的文件
+     * @param text 字符串内容
+     * @param filePath 文件路径
+     * @param charsetName 编码名称
+     */
+    public static void writeText(String text, String filePath, String charsetName) {
+        BufferedWriter bufferedWriter = null;
+        try {
+            bufferedWriter = new BufferedWriter(
+                    new OutputStreamWriter(
+                            new FileOutputStream(filePath), charsetName));
+            bufferedWriter.write(text);
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        } finally {
+            try {
+                if (bufferedWriter != null) {
+                    bufferedWriter.close();
+                }
+            } catch (IOException e) {
+                logger.error("write text to file error: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 使用UTF-8默认编码写出文本内容到指定路径的文件
+     * @param text 字符串内容
+     * @param filePath 文件路径
+     */
+    public static void writeText(String text, String filePath) {
+        writeText(text, filePath, CharsetEnum.UTF8.getValue());
     }
 
     /**

@@ -64,6 +64,33 @@ public class FileUtils {
     }
 
     /**
+     * 在指定的父目录中创建子目录
+     * @param parent 父目录文件
+     * @param dirs 子目录，可以是多级子目录
+     * @return 创建的子目录的绝对路径
+     */
+    public static String mkdirs(File parent, String dirs) {
+        File path = new File(parent, dirs);
+        if (!path.exists()) {
+            path.mkdirs();
+        }
+        return path.getAbsolutePath();
+    }
+
+    /**
+     * 根据指定的路径，如果没有此路径则创建并返回绝对路径，否则直接返回绝对路径
+     * @param dirs 多级目录
+     * @return
+     */
+    public static String mkdirs(String dirs) {
+        File path = new File(dirs);
+        if (!path.exists()) {
+            path.mkdirs();
+        }
+        return path.getAbsolutePath();
+    }
+
+    /**
      * 获取指定文件名的后缀
      * @param fileName 完整的文件名称
      * @return 文件后缀，包括.符号，如.png
