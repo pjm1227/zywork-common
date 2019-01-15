@@ -294,6 +294,15 @@ public class WeixinUtils {
     }
 
     /**
+     * 判断支付业务结果是否成功
+     * @param responseMap
+     * @return
+     */
+    public static boolean isResultSuccess(Map<String, String> responseMap) {
+        return responseMap != null && responseMap.get(PayConstants.RESULT_CODE).equals(PayConstants.RETURN_SUCCESS);
+    }
+
+    /**
      * 获取支付请求结果错误码
      * @param responseMap
      * @return
