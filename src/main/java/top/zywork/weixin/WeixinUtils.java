@@ -277,6 +277,33 @@ public class WeixinUtils {
     }
 
     /**
+     * 判断支付请求结果是否成功
+     * @param responseMap
+     * @return
+     */
+    public static boolean isReturnSuccess(Map<String, String> responseMap) {
+        return responseMap != null && responseMap.get(PayConstants.RETURN_CODE).equals(PayConstants.RETURN_SUCCESS);
+    }
+
+    /**
+     * 获取支付请求结果错误码
+     * @param responseMap
+     * @return
+     */
+    public static String errCode(Map<String, String> responseMap) {
+        return responseMap.get(PayConstants.ERR_CODE);
+    }
+
+    /**
+     * 获取支付请求结果错误码描述
+     * @param responseMap
+     * @return
+     */
+    public static String errCodeDes(Map<String, String> responseMap) {
+        return responseMap.get(PayConstants.ERR_CODE_DES);
+    }
+
+    /**
      * 根据sessionKey，加密数据和iv向量解密手机号信息
      * @param sessionKey
      * @param encryptedData

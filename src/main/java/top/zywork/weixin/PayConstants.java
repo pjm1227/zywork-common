@@ -28,4 +28,22 @@ public class PayConstants {
             "  <return_msg><![CDATA[OK]]></return_msg>" +
             "</xml>";
 
+    // 微信支付返回码
+    public static final String RETURN_CODE = "return_code";
+
+    // 微信支付成功返回码
+    public static final String RETURN_SUCCESS = "SUCCESS";
+
+    // 微信支付失败返回码
+    public static final String RETURN_FAIL = "FAIL";
+
+    // 微信支付业务码
+    public static final String RESULT_CODE = "result_code";
+
+    // 微信支付错误码
+    public static final String ERR_CODE = "err_code";
+
+    // 微信支付错误码描述
+    public static final String ERR_CODE_DES = "err_code_des";
+
 }
