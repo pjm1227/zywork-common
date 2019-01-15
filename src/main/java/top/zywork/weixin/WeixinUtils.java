@@ -232,35 +232,43 @@ public class WeixinUtils {
     }
 
     /**
-     * 读取由微信支付服务器传回的支付结果
+     * 读取由微信支付服务器传回的支付结果Map
      * @param request
      * @return
      */
-    public static PayResult payResult(HttpServletRequest request) {
+    public static Map<String, String> payResultMap(HttpServletRequest request) {
         try {
             ServletInputStream in = request.getInputStream();
             byte[] bytes = new byte[1024];
-            int total = 0;
+            int total;
             StringBuilder result = new StringBuilder();
             while ((total = in.read(bytes)) != -1) {
                 result.append(new String(bytes, 0, total));
             }
-            Map<String, String> payResultMap = WXPayUtil.xmlToMap(result.toString());;
-            PayResult payResult = new PayResult();
-            payResult.setResultCode(payResultMap.get("result_code"));
-            payResult.setAppId(payResultMap.get("appid"));
-            payResult.setMchId(payResultMap.get("mch_id"));
-            payResult.setOpenid(payResultMap.get("openid"));
-            payResult.setOutTradeNo(payResultMap.get("out_trade_no"));
-            payResult.setTransactionId(payResultMap.get("transaction_id"));
-            payResult.setTotalFee(Integer.valueOf(payResultMap.get("total_fee")));
-            payResult.setTradeType(payResultMap.get("trade_type"));
-            payResult.setTimeEnd(payResultMap.get("time_end"));
-            return payResult;
+            return WXPayUtil.xmlToMap(result.toString());
         } catch (Exception e) {
             logger.error("payResult error: {}", e.getMessage());
         }
         return null;
+    }
+
+    /**
+     * 读取由微信支付服务器传回的支付结果PayResult
+     * @param payResultMap
+     * @return
+     */
+    public static PayResult payResult(Map<String, String> payResultMap) {
+        PayResult payResult = new PayResult();
+        payResult.setResultCode(payResultMap.get("result_code"));
+        payResult.setAppId(payResultMap.get("appid"));
+        payResult.setMchId(payResultMap.get("mch_id"));
+        payResult.setOpenid(payResultMap.get("openid"));
+        payResult.setOutTradeNo(payResultMap.get("out_trade_no"));
+        payResult.setTransactionId(payResultMap.get("transaction_id"));
+        payResult.setTotalFee(Integer.valueOf(payResultMap.get("total_fee")));
+        payResult.setTradeType(payResultMap.get("trade_type"));
+        payResult.setTimeEnd(payResultMap.get("time_end"));
+        return payResult;
     }
 
     /**
