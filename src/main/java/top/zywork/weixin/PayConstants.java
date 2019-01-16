@@ -22,6 +22,9 @@ public class PayConstants {
     // 统一下单api地址
     public static final String UNIFIED_ORDER_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
+    // 微信公众号发送普通红包api地址
+    public static final String SEND_RED_PACK = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
+
     // 响应微信支付结果的内容
     public static final String PAY_NOTIFY_RESULT = "<xml>" +
             "  <return_code><![CDATA[SUCCESS]]></return_code>" +

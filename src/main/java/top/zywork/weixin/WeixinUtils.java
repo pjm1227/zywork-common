@@ -202,7 +202,7 @@ public class WeixinUtils {
      * @return
      */
     public static Map<String, String> payDataMap(String appId, String apiKey, Map<String, String> unifiedOrderResult) {
-        Map<String, String> data = new HashMap<String, String>();
+        Map<String, String> data = new HashMap<>();
         data.put("appId", appId);
         data.put("package", "prepay_id=" + unifiedOrderResult.get("prepay_id"));
         data.put("timeStamp", WXPayUtil.getCurrentTimestamp() + "");
@@ -282,6 +282,98 @@ public class WeixinUtils {
         } catch (IOException e) {
             logger.error("responsePayNotify error: {}", e.getMessage());
         }
+    }
+
+    /**
+     * 准备红包发送需要的数据
+     * @param appid 公众号appid
+     * @param mchId 商户id
+     * @param apiKey 商户apikey
+     * @param openid 用户openid
+     * @param ip 调用接口的ip地址
+     * @param mchBillNo 商户订单号
+     * @param sendName 发送名称，如**公司
+     * @param totalAmount 发送金额，普通红包1-200元
+     * @param totalNum 发送人数
+     * @param wishing 祝福语
+     * @param actName 活动名称
+     * @param remark 备注
+     * @param sceneId 普通红包不需要传，非普通红包必传，参考RedpackSceneEnum枚举
+     * @return
+     */
+    public static Map<String, String> redpackData(String appid, String mchId, String apiKey, String openid, String ip, String mchBillNo,
+                                                  String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId) {
+        Map<String, String> data = new HashMap<>();
+        data.put("wxappid", appid);
+        data.put("mch_id", mchId);
+        data.put("nonce_str", UUIDUtils.simpleUuid());
+        data.put("re_openid", openid);
+        data.put("client_ip", ip);
+        data.put("mch_billno", mchBillNo);
+        data.put("send_name", sendName);
+        data.put("total_amount", totalAmount + "");
+        data.put("total_num", totalNum + "");
+        data.put("wishing", wishing);
+        data.put("act_name", actName);
+        data.put("remark", remark);
+        if (sceneId != null) {
+            data.put("scene_id", sceneId);
+        }
+        try {
+            data.put("sign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
+        } catch (Exception e) {
+            logger.error("redpackData error: {}", e.getMessage());
+        }
+        return data;
+    }
+
+    /**
+     * 准备红包发送需要的数据
+     * @param appid 公众号appid
+     * @param mchId 商户id
+     * @param apiKey 商户apikey
+     * @param openid 用户openid
+     * @param ip 调用接口的ip地址
+     * @param mchBillNo 商户订单号
+     * @param sendName 发送名称，如**公司
+     * @param totalAmount 发送金额，普通红包1-200元
+     * @param totalNum 发送人数
+     * @param wishing 祝福语
+     * @param actName 活动名称
+     * @param remark 备注
+     * @param sceneId 非普通红包必传，参考RedpackSceneEnum枚举
+     * @return 发送红包的结果 Map
+     */
+    public static Map<String, String> sendRedpack(String appid, String mchId, String apiKey, String openid, String ip, String mchBillNo,
+                                   String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId) {
+        Map<String, String> redpackData = redpackData(appid, mchId, apiKey, openid, ip, mchBillNo, sendName, totalAmount, totalNum, wishing, actName, wishing, sceneId);
+        try {
+            String redpackResult = HttpUtils.postXML(PayConstants.SEND_RED_PACK, WXPayUtil.mapToXml(redpackData));
+            if (redpackResult != null) {
+                redpackResult = new String(redpackResult.getBytes(CharsetEnum.ISO8859_1.getValue()), CharsetEnum.UTF8.getValue());
+                return WXPayUtil.xmlToMap(redpackResult);
+            }
+        } catch (Exception e) {
+            logger.error("sendRedpack error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 把红包发送的结果Map转化成RedpackResult对象
+     * @param redpackResultMap
+     * @return
+     */
+    public static RedpackResult redpackResult(Map<String, String> redpackResultMap) {
+        RedpackResult redpackResult = new RedpackResult();
+        redpackResult.setWxappid(redpackResultMap.get("wxappid"));
+        redpackResult.setMchId(redpackResultMap.get("mch_id"));
+        redpackResult.setMchBillno(redpackResultMap.get("mch_billno"));
+        redpackResult.setReOpenid(redpackResultMap.get("re_openid"));
+        redpackResult.setResultCode(redpackResultMap.get("result_code"));
+        redpackResult.setSendListid(redpackResultMap.get("send_listid"));
+        redpackResult.setTotalAmount(Integer.valueOf(redpackResultMap.get("total_amount")));
+        return redpackResult;
     }
 
     /**
