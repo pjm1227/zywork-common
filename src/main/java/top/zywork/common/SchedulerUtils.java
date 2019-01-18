@@ -21,8 +21,6 @@ public class SchedulerUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerUtils.class);
 
-    private static SchedulerFactory schedulerFactory;
-
     private static Scheduler scheduler;
 
     public static final String DEFAULT_JOB_GROUP = "zywork_job_group";
@@ -31,10 +29,16 @@ public class SchedulerUtils {
     public static final String DATA_KEY = "data";
 
     /**
-     * 使用quartz初始化SchedulerFactory对象
+     * 使用quartz初始化Schedulery对象
      */
-    public static void initSchedulerFactory() {
-        schedulerFactory = new StdSchedulerFactory();
+    public static void initScheduler() {
+        if (scheduler == null) {
+            try {
+                scheduler = new StdSchedulerFactory().getScheduler();
+            } catch (SchedulerException e) {
+                logger.error("SchedulerFactory getScheduler error: {}", e.getMessage());
+            }
+        }
     }
 
     /**
@@ -42,19 +46,8 @@ public class SchedulerUtils {
      * @param schedulerFactoryBean
      */
     public static void initScheduler(SchedulerFactoryBean schedulerFactoryBean) {
-        scheduler = schedulerFactoryBean.getScheduler();
-    }
-
-    /**
-     * 获取Scheduler对象
-     */
-    private static void getScheduler() {
         if (scheduler == null) {
-            try {
-                scheduler = schedulerFactory.getScheduler();
-            } catch (SchedulerException e) {
-                logger.error("SchedulerFactory getScheduler error: {}", e.getMessage());
-            }
+            scheduler = schedulerFactoryBean.getScheduler();
         }
     }
 
@@ -66,12 +59,12 @@ public class SchedulerUtils {
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
      * @param cronExpression cron表达式
+     * @return
      */
     @SuppressWarnings("unchecked")
-    public static void startJob(String jobClassName, String jobName, String jobGroup, String triggerName,
+    public static boolean startJob(String jobClassName, String jobName, String jobGroup, String triggerName,
                               String triggerGroup, String cronExpression) {
         try {
-            getScheduler();
             Class jobClass = Class.forName(jobClassName);
             JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroup).build();
             Trigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerName, triggerGroup)
@@ -80,8 +73,10 @@ public class SchedulerUtils {
                 scheduler.start();
             }
             scheduler.scheduleJob(jobDetail, trigger);
+            return true;
         } catch (SchedulerException | ClassNotFoundException e) {
             logger.error("start job {} error: {}", jobClassName, e.getMessage());
+            return false;
         }
     }
 
@@ -91,9 +86,10 @@ public class SchedulerUtils {
      * @param jobName 作业名称
      * @param triggerName 触发器名称
      * @param cronExpression cron表达式
+     * @return
      */
-    public static void startJob(String jobClassName, String jobName, String triggerName, String cronExpression) {
-        startJob(jobClassName, jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP, cronExpression);
+    public static boolean startJob(String jobClassName, String jobName, String triggerName, String cronExpression) {
+        return startJob(jobClassName, jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP, cronExpression);
     }
 
     /**
@@ -105,12 +101,12 @@ public class SchedulerUtils {
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
      * @param cronExpression cron表达式
+     * @return
      */
     @SuppressWarnings({"unchecked"})
-    public static void startJob(String jobClassName, String jobName, String jobGroup, Object jobData,
+    public static boolean startJob(String jobClassName, String jobName, String jobGroup, Object jobData,
                                 String triggerName, String triggerGroup, String cronExpression) {
         try {
-            getScheduler();
             Class jobClass = Class.forName(jobClassName);
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(DATA_KEY, jobData);
@@ -121,8 +117,10 @@ public class SchedulerUtils {
                 scheduler.start();
             }
             scheduler.scheduleJob(jobDetail, trigger);
+            return true;
         } catch (SchedulerException | ClassNotFoundException e) {
             logger.error("start job {} with data error: {}", jobClassName, e.getMessage());
+            return false;
         }
     }
 
@@ -133,109 +131,122 @@ public class SchedulerUtils {
      * @param jobData 传递给job的数据所组成的JavaBean
      * @param triggerName 触发器名称
      * @param cronExpression cron表达式
+     * @return
      */
-    public static void startJob(String jobClassName, String jobName, Object jobData, String triggerName, String cronExpression) {
-        startJob(jobClassName, jobName, DEFAULT_JOB_GROUP, jobData, triggerName, DEFAULT_TRIGGER_GROUP, cronExpression);
+    public static boolean startJob(String jobClassName, String jobName, Object jobData, String triggerName, String cronExpression) {
+        return startJob(jobClassName, jobName, DEFAULT_JOB_GROUP, jobData, triggerName, DEFAULT_TRIGGER_GROUP, cronExpression);
     }
 
     /**
      * 暂停一个作业
      * @param jobName 作业名称
      * @param jobGroup 作业组名称
+     * @return
      */
-    public static void pauseJob(String jobName, String jobGroup) {
+    public static boolean pauseJob(String jobName, String jobGroup) {
         try {
-            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.checkExists(jobKey)) {
                 scheduler.pauseJob(jobKey);
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("pause job {} error: {}", jobName, e.getMessage());
+            return false;
         }
     }
 
     /**
      * 暂停一个作业，默认作业组中
      * @param jobName 作业名称
+     * @return
      */
-    public static void pauseJob(String jobName) {
-        pauseJob(jobName, DEFAULT_JOB_GROUP);
+    public static boolean pauseJob(String jobName) {
+        return pauseJob(jobName, DEFAULT_JOB_GROUP);
     }
 
     /**
      * 恢复一个作业
      * @param jobName 作业名称
      * @param jobGroup 作业组名称
+     * @return
      */
-    public static void resumeJob(String jobName, String jobGroup) {
+    public static boolean resumeJob(String jobName, String jobGroup) {
         try {
-            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.checkExists(jobKey)) {
                 scheduler.resumeJob(jobKey);
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("resume job {} error: {}", jobName, e.getMessage());
+            return false;
         }
     }
 
     /**
      * 恢复一个作业，默认作业组中
      * @param jobName 作业名称
+     * @return
      */
-    public static void resumeJob(String jobName) {
-        resumeJob(jobName, DEFAULT_JOB_GROUP);
+    public static boolean resumeJob(String jobName) {
+        return resumeJob(jobName, DEFAULT_JOB_GROUP);
     }
 
     /**
      * 暂停一个触发器
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
+     * @return
      */
-    public static void pauseTrigger(String triggerName, String triggerGroup) {
+    public static boolean pauseTrigger(String triggerName, String triggerGroup) {
         try {
-            getScheduler();
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(triggerKey)) {
                 scheduler.pauseTrigger(triggerKey);
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("pause trigger {} error: {}", triggerName, e.getMessage());
+            return false;
         }
     }
 
     /**
      * 暂停一个触发器，默认触发器组中
      * @param triggerName 触发器名称
+     * @return
      */
-    public static void pauseTrigger(String triggerName) {
-        pauseTrigger(triggerName, DEFAULT_TRIGGER_GROUP);
+    public static boolean pauseTrigger(String triggerName) {
+        return pauseTrigger(triggerName, DEFAULT_TRIGGER_GROUP);
     }
 
     /**
      * 恢复一个触发器
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
+     * @return
      */
-    public static void resumeTrigger(String triggerName, String triggerGroup) {
+    public static boolean resumeTrigger(String triggerName, String triggerGroup) {
         try {
-            getScheduler();
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(triggerKey)) {
                 scheduler.resumeTrigger(triggerKey);
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("resume trigger {} error: {}", triggerName, e.getMessage());
+            return false;
         }
     }
 
     /**
      * 恢复一个触发器，默认触发器组
      * @param triggerName 触发器名称
+     * @return
      */
-    public static void resumeTrigger(String triggerName) {
-        resumeTrigger(triggerName, DEFAULT_TRIGGER_GROUP);
+    public static boolean resumeTrigger(String triggerName) {
+        return resumeTrigger(triggerName, DEFAULT_TRIGGER_GROUP);
     }
 
     /**
@@ -244,18 +255,20 @@ public class SchedulerUtils {
      * @param jobGroup 作业组名称
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
+     * @return
      */
-    public static void stopJob(String jobName, String jobGroup, String triggerName, String triggerGroup) {
+    public static boolean stopJob(String jobName, String jobGroup, String triggerName, String triggerGroup) {
         try {
-            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(jobKey)) {
                 scheduler.pauseTrigger(triggerKey);
                 scheduler.unscheduleJob(triggerKey);
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("stop job {} error: {}", jobName, e.getMessage());
+            return false;
         }
     }
 
@@ -263,20 +276,21 @@ public class SchedulerUtils {
      * 停止一个作业，默认作业组及触发器组
      * @param jobName 作业名称
      * @param triggerName 触发器名称
+     * @return
      */
-    public static void stopJob(String jobName, String triggerName) {
-        stopJob(jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP);
+    public static boolean stopJob(String jobName, String triggerName) {
+        return stopJob(jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP);
     }
 
     /**
      * 重启一个正在运行的作业，如果是已经停止的作业，不可被重启
      * @param jobName 作业名称
      * @param jobGroup 作业组名称
+     * @return
      */
     @SuppressWarnings({"unchecked"})
-    public static void restartJob(String jobName, String jobGroup) {
+    public static boolean restartJob(String jobName, String jobGroup) {
         try {
-            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.checkExists(jobKey)) {
                 List<Trigger> triggerList = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
@@ -284,30 +298,35 @@ public class SchedulerUtils {
                     scheduler.rescheduleJob(trigger.getKey(), trigger);
                 }
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("restart running job {} error: {}", jobName, e.getMessage());
+            return false;
         }
     }
 
     /**
      * 重启一个作业，默认作业组中
      * @param jobName 作业名称
+     * @return
      */
-    public static void restartJob(String jobName) {
-        restartJob(jobName, DEFAULT_JOB_GROUP);
+    public static boolean restartJob(String jobName) {
+        return restartJob(jobName, DEFAULT_JOB_GROUP);
     }
 
     /**
      * 停止所有作业，并关闭Scheduler
+     * @return
      */
-    public static void stopAllJobs() {
+    public static boolean stopAllJobs() {
         try {
-            getScheduler();
             if (!scheduler.isShutdown()) {
                 scheduler.shutdown();
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("stop all jobs error: {}", e.getMessage());
+            return false;
         }
     }
 
@@ -318,10 +337,10 @@ public class SchedulerUtils {
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
      * @param cronExpression cron表达式
+     * @return
      */
-    public static void modifyJob(String jobName, String jobGroup, String triggerName, String triggerGroup, String cronExpression) {
+    public static boolean modifyJob(String jobName, String jobGroup, String triggerName, String triggerGroup, String cronExpression) {
         try {
-            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(jobKey)) {
@@ -331,8 +350,10 @@ public class SchedulerUtils {
                 scheduler.scheduleJob(jobDetail, TriggerBuilder.newTrigger().withIdentity(triggerName, triggerGroup)
                         .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)).build());
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("modify job {} with new cron expression {} error: {}", jobName, cronExpression, e.getMessage());
+            return false;
         }
     }
 
@@ -341,9 +362,10 @@ public class SchedulerUtils {
      * @param jobName 作业名称
      * @param triggerName 触发器名称
      * @param cronExpression cron表达式
+     * @return
      */
-    public static void modifyJob(String jobName, String triggerName, String cronExpression) {
-        modifyJob(jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP, cronExpression);
+    public static boolean modifyJob(String jobName, String triggerName, String cronExpression) {
+        return modifyJob(jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP, cronExpression);
     }
 
     /**
@@ -352,10 +374,10 @@ public class SchedulerUtils {
      * @param jobGroup 作业组名称
      * @param triggerName 触发器名称
      * @param triggerGroup 触发器组名称
+     * @return
      */
-    public static void deleteJob(String jobName, String jobGroup,  String triggerName, String triggerGroup) {
+    public static boolean deleteJob(String jobName, String jobGroup,  String triggerName, String triggerGroup) {
         try {
-            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(jobKey)) {
@@ -363,8 +385,10 @@ public class SchedulerUtils {
                 scheduler.unscheduleJob(triggerKey);
                 scheduler.deleteJob(jobKey);
             }
+            return true;
         } catch (SchedulerException e) {
             logger.error("delete job {} error: {}", jobName, e.getMessage());
+            return false;
         }
     }
 
@@ -372,9 +396,10 @@ public class SchedulerUtils {
      * 删除一个作业，默认作业组和触发器组
      * @param jobName 作业名称
      * @param triggerName 触发器名称
+     * @return
      */
-    public static void deleteJob(String jobName, String triggerName) {
-        deleteJob(jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP);
+    public static boolean deleteJob(String jobName, String triggerName) {
+        return deleteJob(jobName, DEFAULT_JOB_GROUP, triggerName, DEFAULT_TRIGGER_GROUP);
     }
 
     /**
