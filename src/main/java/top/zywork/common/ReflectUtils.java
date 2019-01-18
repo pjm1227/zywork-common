@@ -5,10 +5,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * 反射工具类<br/>
@@ -20,6 +30,10 @@ import java.lang.reflect.Parameter;
 public class ReflectUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ReflectUtils.class);
+
+    public static final String CLASS_PATH_PREFIX = File.separator + "classes" + File.separator;
+
+    public static final String CLASS_SUFFIX = ".class";
 
     /**
      * 调用指定属性的getter方法
@@ -159,6 +173,137 @@ public class ReflectUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * 获取指定包中的所有带有指定注解的类名称，如top.zywork.common.Test
+     * @param packageName 指定包名
+     * @param recursive 是否迭代查询包
+     * @param annotation 如果指定了Annotation，则只会去获取带有此Annotation的类信息，如果未指定，为null，则获取所有的类信息
+     * @return
+     */
+    public static List<String> getClassNames(String packageName, Boolean recursive, Class<? extends Annotation> annotation) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        packageName = packageName.replaceAll("\\.", File.separator);
+        List<String> classNames = new ArrayList<>();
+        try {
+            Enumeration<URL> urlEnumeration = classLoader.getResources(packageName);
+            while (urlEnumeration.hasMoreElements()) {
+                URL url = urlEnumeration.nextElement();
+                String protocol = url.getProtocol();
+                if ("file".equals(protocol)) {
+                    classNames.addAll(getClassNamesFromFile(new File(url.getPath()), recursive, annotation));
+                } else if ("jar".equals(protocol)) {
+                    classNames.addAll(getClassNamesFromJar(((JarURLConnection) url.openConnection()).getJarFile(), recursive, annotation));
+                }
+            }
+            return classNames;
+        } catch (IOException e) {
+            logger.error("getClassNames error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 以文件的方式获取类信息
+     * @param file
+     * @param recursive
+     * @param annotation
+     * @return
+     */
+    private static List<String> getClassNamesFromFile(File file, Boolean recursive, Class<? extends Annotation> annotation) {
+        List<String> classNames = new ArrayList<>();
+        File[] files = file.listFiles();
+        if (files != null && files.length > 0) {
+            for (File f : files) {
+                if (!f.isDirectory()) {
+                    String classPath = f.getPath();
+                    // 过滤掉所有内部类
+                    if (classPath.endsWith(CLASS_SUFFIX) && !isInnerClass(classPath)) {
+                        String className = classPath.substring(classPath.indexOf(CLASS_PATH_PREFIX) + CLASS_PATH_PREFIX.length())
+                                .replace(CLASS_SUFFIX, "")
+                                .replaceAll("/", ".");
+                        if (isClassWithAnnotation(className, annotation)) {
+                            classNames.add(className);
+                        }
+                    }
+                } else {
+                    classNames.addAll(getClassNamesFromFile(f, recursive, annotation));
+                }
+            }
+        }
+        return classNames;
+    }
+
+    /**
+     * 通过JarFile获取类信息
+     * @param jarFile
+     * @param recursive
+     * @param annotation
+     * @return
+     */
+    private static List<String> getClassNamesFromJar(JarFile jarFile, Boolean recursive, Class<? extends Annotation> annotation) {
+        List<String> classNames = new ArrayList<>();
+        Enumeration<JarEntry> entries = jarFile.entries();
+        while(entries.hasMoreElements()) {
+            JarEntry jarEntry = entries.nextElement();
+            String name = jarEntry.getName();
+            // 过滤掉所有内部类
+            if (name.endsWith(CLASS_SUFFIX) && !isInnerClass(name)) {
+                String className = name.replace(CLASS_SUFFIX, "")
+                        .replaceAll("/", ".");
+                if (isClassWithAnnotation(className, annotation)) {
+                    classNames.add(className);
+                }
+            }
+        }
+        return classNames;
+    }
+
+    /**
+     * 判断指定类名的类是否为内部类
+     * @param className
+     * @return
+     */
+    public static boolean isInnerClass(String className) {
+        return className.contains("$");
+    }
+
+    /**
+     * 判断指定的类是否为内部类
+     * @param clazz
+     * @return
+     */
+    public static boolean isInnerClass(Class<?> clazz) {
+        return isInnerClass(clazz.getName());
+    }
+
+    /**
+     * 判断指定类名的类是否带有指定的注解
+     * @param className
+     * @param annotation
+     * @return
+     */
+    public static boolean isClassWithAnnotation(String className, Class<? extends Annotation> annotation) {
+        if (annotation == null) {
+            return true;
+        }
+        try {
+            return isClassWithAnnotation(Class.forName(className), annotation);
+        } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError e) {
+            logger.error("isClassWithAnnotation error: {}, class name: {}", e.getMessage(), className);
+            return false;
+        }
+    }
+
+    /**
+     * 判断指定的类是否带有指定的注解
+     * @param clazz
+     * @param annotation
+     * @return
+     */
+    public static boolean isClassWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
+        return clazz.isAnnotationPresent(annotation);
     }
 
 }

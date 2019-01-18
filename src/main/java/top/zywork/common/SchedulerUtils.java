@@ -4,6 +4,7 @@ import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.util.List;
 
@@ -22,13 +23,39 @@ public class SchedulerUtils {
 
     private static SchedulerFactory schedulerFactory;
 
+    private static Scheduler scheduler;
+
     public static final String DEFAULT_JOB_GROUP = "zywork_job_group";
     public static final String DEFAULT_TRIGGER_GROUP = "zywork_trigger_group";
 
     public static final String DATA_KEY = "data";
 
-    static {
+    /**
+     * 使用quartz初始化SchedulerFactory对象
+     */
+    public static void initSchedulerFactory() {
         schedulerFactory = new StdSchedulerFactory();
+    }
+
+    /**
+     * 通过Spring-scheduler的SchedulerFactoryBean初始化Scheduler对象
+     * @param schedulerFactoryBean
+     */
+    public static void initScheduler(SchedulerFactoryBean schedulerFactoryBean) {
+        scheduler = schedulerFactoryBean.getScheduler();
+    }
+
+    /**
+     * 获取Scheduler对象
+     */
+    private static void getScheduler() {
+        if (scheduler == null) {
+            try {
+                scheduler = schedulerFactory.getScheduler();
+            } catch (SchedulerException e) {
+                logger.error("SchedulerFactory getScheduler error: {}", e.getMessage());
+            }
+        }
     }
 
     /**
@@ -44,7 +71,7 @@ public class SchedulerUtils {
     public static void startJob(String jobClassName, String jobName, String jobGroup, String triggerName,
                               String triggerGroup, String cronExpression) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             Class jobClass = Class.forName(jobClassName);
             JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroup).build();
             Trigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerName, triggerGroup)
@@ -83,7 +110,7 @@ public class SchedulerUtils {
     public static void startJob(String jobClassName, String jobName, String jobGroup, Object jobData,
                                 String triggerName, String triggerGroup, String cronExpression) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             Class jobClass = Class.forName(jobClassName);
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(DATA_KEY, jobData);
@@ -118,7 +145,7 @@ public class SchedulerUtils {
      */
     public static void pauseJob(String jobName, String jobGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.checkExists(jobKey)) {
                 scheduler.pauseJob(jobKey);
@@ -143,7 +170,7 @@ public class SchedulerUtils {
      */
     public static void resumeJob(String jobName, String jobGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.checkExists(jobKey)) {
                 scheduler.resumeJob(jobKey);
@@ -168,7 +195,7 @@ public class SchedulerUtils {
      */
     public static void pauseTrigger(String triggerName, String triggerGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(triggerKey)) {
                 scheduler.pauseTrigger(triggerKey);
@@ -193,7 +220,7 @@ public class SchedulerUtils {
      */
     public static void resumeTrigger(String triggerName, String triggerGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(triggerKey)) {
                 scheduler.resumeTrigger(triggerKey);
@@ -220,7 +247,7 @@ public class SchedulerUtils {
      */
     public static void stopJob(String jobName, String jobGroup, String triggerName, String triggerGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(jobKey)) {
@@ -249,7 +276,7 @@ public class SchedulerUtils {
     @SuppressWarnings({"unchecked"})
     public static void restartJob(String jobName, String jobGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.checkExists(jobKey)) {
                 List<Trigger> triggerList = (List<Trigger>) scheduler.getTriggersOfJob(jobKey);
@@ -275,7 +302,7 @@ public class SchedulerUtils {
      */
     public static void stopAllJobs() {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             if (!scheduler.isShutdown()) {
                 scheduler.shutdown();
             }
@@ -294,7 +321,7 @@ public class SchedulerUtils {
      */
     public static void modifyJob(String jobName, String jobGroup, String triggerName, String triggerGroup, String cronExpression) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(jobKey)) {
@@ -328,7 +355,7 @@ public class SchedulerUtils {
      */
     public static void deleteJob(String jobName, String jobGroup,  String triggerName, String triggerGroup) {
         try {
-            Scheduler scheduler = schedulerFactory.getScheduler();
+            getScheduler();
             JobKey jobKey = new JobKey(jobName, jobGroup);
             TriggerKey triggerKey = new TriggerKey(triggerName, triggerGroup);
             if (scheduler.checkExists(jobKey)) {
