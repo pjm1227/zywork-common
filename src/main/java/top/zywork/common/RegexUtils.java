@@ -34,6 +34,10 @@ public class RegexUtils {
     public static final String REGEX_BLANK = "\\s+";
     public static final String REGEX_URL = "(https?://(w{3}\\.)?)?\\w+\\.\\w+(\\.[a-zA-Z]+)*(:\\d{1,5})?(/\\w*)*(\\??(.+=.*)?(&.+=.*)?)?";
     public static final String REGEX_POSTCODE = "[1-9]\\d{5}";
+    public static final String REGEX_DATE = "^[1-9]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$";
+    public static final String REGEX_TIME = "^(20|21|22|23|[0-1]\\d):[0-5]\\d:[0-5]\\d$";
+    public static final String REGEX_DATETIME = "^[1-9]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])\\s+(20|21|22|23|[0-1]\\d):[0-5]\\d:[0-5]\\d$";
+
     /**
      * 英文与数字混合的账号
      */
