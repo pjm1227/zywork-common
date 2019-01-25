@@ -85,6 +85,13 @@ public interface BaseService {
      * @return DTO数据传输对象组成的PagerDTO
      */
     PagerDTO listAll();
+
+    /**
+     * 根据条件查询对象查找符合条件的所有数据
+     * @param queryObj 条件查询对象
+     * @return DTO数据传输对象组成的PagerDTO
+     */
+    PagerDTO listAllByCondition(Object queryObj);
     
     /**
      * 根据分页查询对象和条件查询对象查找数据

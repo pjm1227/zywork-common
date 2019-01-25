@@ -101,6 +101,19 @@ public abstract class AbstractBaseService implements BaseService {
     }
 
     @Override
+    public PagerDTO listAllByCondition(Object queryObj) {
+        PagerDTO pagerDTO = new PagerDTO();
+        List<Object> dtoObjList = new ArrayList<>();
+        List<Object> doObjList = baseDAO.listAllByCondition(queryObj);
+        if (doObjList != null && doObjList.size() > 0) {
+            dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
+        }
+        pagerDTO.setRows(dtoObjList);
+        pagerDTO.setTotal((long) dtoObjList.size());
+        return pagerDTO;
+    }
+
+    @Override
     public PagerDTO listPageByCondition(Object queryObj) {
         PagerDTO pagerDTO = new PagerDTO();
         Long count = baseDAO.countByCondition(queryObj);

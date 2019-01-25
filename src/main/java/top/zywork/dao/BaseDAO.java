@@ -83,6 +83,13 @@ public interface BaseDAO {
     List<Object> listAll();
 
     /**
+     * 根据条件查询对象查找符合条件的所有数据
+     * @param queryObj 条件查询对象
+     * @return 按照条件的所有数据DO对象组成的List列表
+     */
+    List<Object> listAllByCondition(Object queryObj);
+
+    /**
      * 根据分页查询对象和条件查询对象查找数据
      * @param queryObj 条件查询对象，包括分页数据
      * @return 按照条件的分页数据DO对象所组成的List列表
