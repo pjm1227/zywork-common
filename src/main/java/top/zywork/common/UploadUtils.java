@@ -41,7 +41,7 @@ public class UploadUtils {
         String fileName = file.getOriginalFilename();
         long fileSize = file.getSize();
         if (fileSize > maxSize) {
-            return ResponseStatusVO.dataError("超过最大文件限制，最大大小：" + maxSize + "MB", null);
+            return ResponseStatusVO.dataError("超过最大文件限制，最大大小：" + maxSize / 1024 / 1024 + "MB", null);
         }
         if (!FileUtils.checkExt(fileName, allowedExts)) {
             return ResponseStatusVO.dataError("文件类型错误，后缀只能是：" + allowedExts, null);
@@ -66,7 +66,7 @@ public class UploadUtils {
             String fileName = file.getOriginalFilename();
             long fileSize = file.getSize();
             if (fileSize > maxSize) {
-                return ResponseStatusVO.dataError("第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize + "MB", null);
+                return ResponseStatusVO.dataError("第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize / 1024 / 1024 + "MB", null);
             }
             if (!FileUtils.checkExt(fileName, allowedExts)) {
                 return ResponseStatusVO.dataError("第" + (i + 1) + "个文件类型错误，后缀只能是：" + allowedExts, null);

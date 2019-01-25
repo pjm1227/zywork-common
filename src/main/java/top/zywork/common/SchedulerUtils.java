@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -410,6 +411,36 @@ public class SchedulerUtils {
     public static Object getJobData(JobExecutionContext jobExecutionContext) {
         JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         return jobDataMap != null ? jobDataMap.get(DATA_KEY) : null;
+    }
+
+    /**
+     * 获取所有正在运行的任务
+     * @return
+     */
+    public static List<JobExecutionContext> executingJobs() {
+        try {
+            return scheduler.getCurrentlyExecutingJobs();
+        } catch (SchedulerException e) {
+            logger.error("get executing jobs error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取所有正在运行的任务名称
+     * @return
+     */
+    public static List<String> executingJobNames() {
+        List<JobExecutionContext> jobExecutionContextList = executingJobs();
+        if (jobExecutionContextList == null) {
+            return null;
+        }
+        List<String> jobNames = new ArrayList<>();
+        for (JobExecutionContext jobExecutionContext : jobExecutionContextList) {
+            JobKey jobKey = jobExecutionContext.getJobDetail().getKey();
+            jobNames.add(jobKey.getName());
+        }
+        return jobNames;
     }
 
 }
