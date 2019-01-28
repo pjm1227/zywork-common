@@ -14,4 +14,10 @@ import java.lang.annotation.*;
 @Documented
 public @interface ExposeClass {
 
+    /**
+     * 用于描述类的类型，如 type = "job"
+     * @return
+     */
+    String type() default "";
+
 }

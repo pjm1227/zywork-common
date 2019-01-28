@@ -1,9 +1,11 @@
 package top.zywork.common;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import top.zywork.annotation.ExposeClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -194,7 +196,7 @@ public class ReflectUtils {
                 if ("file".equals(protocol)) {
                     classNames.addAll(getClassNamesFromFile(new File(url.getPath()), recursive, annotation));
                 } else if ("jar".equals(protocol)) {
-                    classNames.addAll(getClassNamesFromJar(((JarURLConnection) url.openConnection()).getJarFile(), recursive, annotation));
+                    classNames.addAll(getClassNamesFromJar(((JarURLConnection) url.openConnection()).getJarFile(), annotation));
                 }
             }
             return classNames;
@@ -228,7 +230,9 @@ public class ReflectUtils {
                         }
                     }
                 } else {
-                    classNames.addAll(getClassNamesFromFile(f, recursive, annotation));
+                    if (recursive) {
+                        classNames.addAll(getClassNamesFromFile(f, recursive, annotation));
+                    }
                 }
             }
         }
@@ -238,11 +242,10 @@ public class ReflectUtils {
     /**
      * 通过JarFile获取类信息
      * @param jarFile
-     * @param recursive
      * @param annotation
      * @return
      */
-    private static List<String> getClassNamesFromJar(JarFile jarFile, Boolean recursive, Class<? extends Annotation> annotation) {
+    private static List<String> getClassNamesFromJar(JarFile jarFile, Class<? extends Annotation> annotation) {
         List<String> classNames = new ArrayList<>();
         Enumeration<JarEntry> entries = jarFile.entries();
         while(entries.hasMoreElements()) {
@@ -304,6 +307,116 @@ public class ReflectUtils {
      */
     public static boolean isClassWithAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
         return clazz.isAnnotationPresent(annotation);
+    }
+
+    /**
+     * 获取带有ExposeClass注解的类，并可指定ExposeClass的type
+     * @param packageName
+     * @param recursive
+     * @param type
+     * @return
+     */
+    public static List<String> getExposeClassNames(String packageName, Boolean recursive, String type) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        packageName = packageName.replaceAll("\\.", File.separator);
+        List<String> classNames = new ArrayList<>();
+        try {
+            Enumeration<URL> urlEnumeration = classLoader.getResources(packageName);
+            while (urlEnumeration.hasMoreElements()) {
+                URL url = urlEnumeration.nextElement();
+                String protocol = url.getProtocol();
+                if ("file".equals(protocol)) {
+                    classNames.addAll(getExposeClassNamesFromFile(new File(url.getPath()), recursive, type));
+                } else if ("jar".equals(protocol)) {
+                    classNames.addAll(getExposeClassNamesFromJar(((JarURLConnection) url.openConnection()).getJarFile(), type));
+                }
+            }
+            return classNames;
+        } catch (IOException e) {
+            logger.error("getExposeClassNames error: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从文件中获取带有ExposeClass注解的类，并可指定ExposeClass的type
+     * @param file
+     * @param recursive
+     * @param type
+     * @return
+     */
+    private static List<String> getExposeClassNamesFromFile(File file, Boolean recursive, String type) {
+        List<String> classNames = new ArrayList<>();
+        File[] files = file.listFiles();
+        if (files != null && files.length > 0) {
+            for (File f : files) {
+                if (!f.isDirectory()) {
+                    String classPath = f.getPath();
+                    // 过滤掉所有内部类
+                    if (classPath.endsWith(CLASS_SUFFIX) && !isInnerClass(classPath)) {
+                        String className = classPath.substring(classPath.indexOf(CLASS_PATH_PREFIX) + CLASS_PATH_PREFIX.length())
+                                .replace(CLASS_SUFFIX, "")
+                                .replaceAll("/", ".");
+                        if (isExposeClass(className, type)) {
+                            classNames.add(className);
+                        }
+                    }
+                } else {
+                    if (recursive) {
+                        classNames.addAll(getExposeClassNamesFromFile(f, recursive, type));
+                    }
+                }
+            }
+        }
+        return classNames;
+    }
+
+    /**
+     * 从jar文件中获取带有ExposeClass注解的类，并可指定ExposeClass的type
+     * @param jarFile
+     * @param type
+     * @return
+     */
+    private static List<String> getExposeClassNamesFromJar(JarFile jarFile, String type) {
+        List<String> classNames = new ArrayList<>();
+        Enumeration<JarEntry> entries = jarFile.entries();
+        while(entries.hasMoreElements()) {
+            JarEntry jarEntry = entries.nextElement();
+            String name = jarEntry.getName();
+            // 过滤掉所有内部类
+            if (name.endsWith(CLASS_SUFFIX) && !isInnerClass(name)) {
+                String className = name.replace(CLASS_SUFFIX, "")
+                        .replaceAll("/", ".");
+                if (isExposeClass(className, type)) {
+                    classNames.add(className);
+                }
+            }
+        }
+        return classNames;
+    }
+
+    /**
+     * 判断是否为带有ExposeClass注解的类，并且可指定ExposeClass的type
+     * @param className 需要判断的类
+     * @param type ExposeClass的type
+     * @return
+     */
+    public static boolean isExposeClass(String className, String type) {
+        try {
+            Class clazz = Class.forName(className);
+            boolean isExpose = isClassWithAnnotation(clazz, ExposeClass.class);
+            if (StringUtils.isEmpty(type)) {
+                return isExpose;
+            }
+            if (isExpose) {
+                ExposeClass exposeClass = (ExposeClass) clazz.getDeclaredAnnotation(ExposeClass.class);
+                isExpose = type.equals(exposeClass.type());
+            }
+            return isExpose;
+        } catch (ClassNotFoundException | NoClassDefFoundError | ExceptionInInitializerError e) {
+            logger.error("isExposeClass error: {}, class name: {}, type: {}", e.getMessage(), className, type);
+            return false;
+        }
     }
 
 }
