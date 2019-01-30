@@ -45,6 +45,10 @@ public class WeixinUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(WeixinUtils.class);
 
+    public static final String FROM_URL = "fromUrl";
+
+    public static final String SHARE_CODE = "shareCode";
+
     /**
      * 从哪个url进入到公众号授权界面
      * @param appId
@@ -55,8 +59,8 @@ public class WeixinUtils {
      */
     public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String fromUrl, String shareCode) {
         loginRedirectUrl += "/" + DateUtils.currentTimeMillis();
-        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(fromUrl) ? "" : "/" + fromUrl);
-        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(shareCode) ? "" : "/" + shareCode);
+        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(fromUrl) ? "/" + FROM_URL : "/" + fromUrl);
+        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(shareCode) ? "/" + SHARE_CODE : "/" + shareCode);
         return GzhConstants.AUTHORIZE_URL.replace("{APP_ID}", appId).replace("{REDIRECT_URL}", loginRedirectUrl);
     }
 
