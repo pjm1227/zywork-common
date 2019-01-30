@@ -54,9 +54,9 @@ public class WeixinUtils {
      * @return
      */
     public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String fromUrl, String shareCode) {
-        loginRedirectUrl += "?t=" + DateUtils.currentTimeMillis();
-        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(fromUrl) ? "" : "&fromUrl=" + fromUrl);
-        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(shareCode) ? "" : "&shareCode=" + shareCode);
+        loginRedirectUrl += "/" + DateUtils.currentTimeMillis();
+        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(fromUrl) ? "" : "/" + fromUrl);
+        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(shareCode) ? "" : "/" + shareCode);
         return GzhConstants.AUTHORIZE_URL.replace("{APP_ID}", appId).replace("{REDIRECT_URL}", loginRedirectUrl);
     }
 
