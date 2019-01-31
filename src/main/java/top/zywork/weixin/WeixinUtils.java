@@ -180,7 +180,6 @@ public class WeixinUtils {
         try {
             String unifiedOrderResult = HttpUtils.postXML(PayConstants.UNIFIED_ORDER_URL, WXPayUtil.mapToXml(unifiedOrderData));
             if (unifiedOrderResult != null) {
-                unifiedOrderResult = new String(unifiedOrderResult.getBytes(CharsetEnum.ISO8859_1.getValue()), CharsetEnum.UTF8.getValue());
                 return WXPayUtil.xmlToMap(unifiedOrderResult);
             }
         } catch (Exception e) {
