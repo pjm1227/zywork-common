@@ -109,11 +109,6 @@ public class WeixinUtils {
         if (gzhAuth != null) {
             String userInfo = HttpUtils.get(GzhConstants.USER_INFO.replace("{ACCESS_TOKEN}", gzhAuth.getAccessToken()).replace("{OPENID}", gzhAuth.getOpenid()));
             if (StringUtils.isNotEmpty(userInfo) && !userInfo.contains(WeixinConstants.ERROR_CODE_STR)) {
-                try {
-                    userInfo = new String(userInfo.getBytes(CharsetEnum.ISO8859_1.getValue()), CharsetEnum.UTF8.getValue());
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
                 JSONObject userInfoJSON = JSON.parseObject(userInfo);
                 weixinUser = new WeixinUser();
                 weixinUser.setOpenid(gzhAuth.getOpenid());
