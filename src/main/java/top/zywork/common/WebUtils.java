@@ -142,6 +142,29 @@ public class WebUtils {
         return getServletContext().getContextPath();
     }
 
+    /**
+     * 写出cookie
+     * @param response
+     * @param name
+     * @param value
+     */
+    public static void setCookie(HttpServletResponse response, String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        response.addCookie(cookie);
+    }
+
+    /**
+     * 写出cookie
+     * @param response
+     * @param name
+     * @param value
+     * @param expiration 失效时间，单位为s
+     */
+    public static void setCookie(HttpServletResponse response, String name, String value, int expiration) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setMaxAge(expiration);
+        response.addCookie(cookie);
+    }
 
     /**
      * 根据cookie名称获取Cookie对象

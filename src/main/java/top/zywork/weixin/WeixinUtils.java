@@ -7,7 +7,6 @@ import com.github.wxpay.sdk.WXPayUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.zywork.common.DateUtils;
 import top.zywork.common.HttpUtils;
 import top.zywork.common.IOUtils;
 import top.zywork.common.UUIDUtils;
@@ -45,22 +44,19 @@ public class WeixinUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(WeixinUtils.class);
 
-    public static final String FROM_URL = "fromUrl";
+    public static final String EXTRA_PARAMS = "extraParams";
 
-    public static final String SHARE_CODE = "shareCode";
+    public static final String EXTRA_PARAMS_SEPERATOR = "__";
 
     /**
      * 从哪个url进入到公众号授权界面
      * @param appId
      * @param loginRedirectUrl
-     * @param fromUrl
-     * @param shareCode
+     * @param extraParams http://zywork.top/test.html__shareCode__notAuth
      * @return
      */
-    public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String fromUrl, String shareCode) {
-        loginRedirectUrl += "/" + DateUtils.currentTimeMillis();
-        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(fromUrl) ? "/" + FROM_URL : "/" + fromUrl);
-        loginRedirectUrl = loginRedirectUrl + (StringUtils.isEmpty(shareCode) ? "/" + SHARE_CODE : "/" + shareCode);
+    public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String extraParams) {
+        loginRedirectUrl += "?" + EXTRA_PARAMS + "=" + extraParams;
         return GzhConstants.AUTHORIZE_URL.replace("{APP_ID}", appId).replace("{REDIRECT_URL}", loginRedirectUrl);
     }
 
