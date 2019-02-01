@@ -50,7 +50,7 @@ public class UploadUtils {
     }
 
     /**
-     * 多文件上传，如果是图片，可指定是否对图片进行压缩
+     * 多文件上传，如果是图片，可指定是否对图片进行压缩，返回的ResponseStatusVO的data是所有文件上传后的文件名列表组成的新列表
      * @param files 多个文件
      * @param allowedExts 允许的后缀
      * @param maxSize 最大文件大小，单位byte
@@ -73,14 +73,16 @@ public class UploadUtils {
             }
         }
         int errorCount = 0;
+        List<Object> results = new ArrayList<>();
         for (MultipartFile file : files) {
             ResponseStatusVO statusVO = save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales);
+            results.add(statusVO.getData());
             if (statusVO.getCode().intValue() == ResponseStatusEnum.DATA_ERROR.getCode()) {
                 errorCount++;
             }
         }
         return ResponseStatusVO.ok(errorCount == 0 ? "所有文件上传成功"
-                : errorCount == files.length ? "所有文件上传失败" : "部分文件上传上传失败，请检查后再次上传", null);
+                : errorCount == files.length ? "所有文件上传失败" : errorCount + "个文件上传失败，请检查后再次上传", results);
     }
 
     /**
