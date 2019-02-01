@@ -52,7 +52,7 @@ public class WeixinUtils {
      * 从哪个url进入到公众号授权界面
      * @param appId
      * @param loginRedirectUrl
-     * @param extraParams http://zywork.top/test.html__shareCode__notAuth
+     * @param extraParams http://zywork.top/test.html__notAuthUrl__shareCode
      * @return
      */
     public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String extraParams) {
