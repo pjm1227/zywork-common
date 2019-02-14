@@ -1,6 +1,5 @@
 package top.zywork.common;
 
-import top.zywork.constant.BPMNConstants;
 import top.zywork.constant.FileConstants;
 import top.zywork.enums.DatePatternEnum;
 
@@ -214,14 +213,6 @@ public class FileUtils {
     public static String newFileNameWithoutExt(String fileName) {
         return DateFormatUtils.format(DateUtils.currentTimeMillis(), DatePatternEnum.DATETIME_SIMPLE.getValue())
                 + "" + RandomUtils.randomNum(10000, 99999);
-    }
-
-    /**
-     * 获取src根目录下的bpmn目录路径
-     * @return
-     */
-    public static String getBPMNDir() {
-        return getClasspath() + "/" + BPMNConstants.BPMN_DIR + "/";
     }
 
 }
