@@ -342,6 +342,27 @@ public class ActivitiUtils {
      * 根据流程名称获取已经启动的所有流程实例
      *
      * @param runtimeService RuntimeService实例
+     * @param offset 开始索引
+     * @param limit 个数
+     * @return 流程实例列表
+     */
+    @SuppressWarnings({"unchecked"})
+    public static PagerVO listProcessInstances(RuntimeService runtimeService, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
+        ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
+        long total = processInstanceQuery.count();
+        if (total > 0) {
+            pagerVO.setTotal(total);
+            // List<ProcessInstance>
+            pagerVO.setRows((List) processInstanceQuery.listPage(offset, limit));
+        }
+        return pagerVO;
+    }
+
+    /**
+     * 根据流程名称获取已经启动的所有流程实例
+     *
+     * @param runtimeService RuntimeService实例
      * @param processKey    流程名称
      * @param offset 开始索引
      * @param limit 个数
@@ -365,13 +386,35 @@ public class ActivitiUtils {
      *
      * @param runtimeService RuntimeService实例
      * @param userIdentity   启动流程的用户标识
+     * @param offset 开始索引
+     * @param limit 个数
+     * @return 流程实例列表
+     */
+    @SuppressWarnings({"unchecked"})
+    public static PagerVO listUserProcessInstances(RuntimeService runtimeService, String userIdentity, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
+        ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().startedBy(userIdentity);
+        long total = processInstanceQuery.count();
+        if (total > 0) {
+            pagerVO.setTotal(total);
+            // List<ProcessInstance>
+            pagerVO.setRows((List) processInstanceQuery.listPage(offset, limit));
+        }
+        return pagerVO;
+    }
+
+    /**
+     * 根据用户标识和流程名称获取已经启动的所有流程实例
+     *
+     * @param runtimeService RuntimeService实例
+     * @param userIdentity   启动流程的用户标识
      * @param processKey    流程名称
      * @param offset 开始索引
      * @param limit 个数
      * @return 流程实例列表
      */
     @SuppressWarnings({"unchecked"})
-    public static PagerVO listProcessInstances(RuntimeService runtimeService, String userIdentity, String processKey, int offset, int limit) {
+    public static PagerVO listUserProcessInstances(RuntimeService runtimeService, String userIdentity, String processKey, int offset, int limit) {
         PagerVO pagerVO = new PagerVO(0L, null);
         ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey(processKey).startedBy(userIdentity);
         long total = processInstanceQuery.count();
@@ -609,7 +652,7 @@ public class ActivitiUtils {
      * @return 所有历史流程实例
      */
     @SuppressWarnings({"unchecked"})
-    public static PagerVO listHistoricProcessInstances(HistoryService historyService, String processKey, String userIdentity, int offset, int limit) {
+    public static PagerVO listUserHistoricProcessInstances(HistoryService historyService, String processKey, String userIdentity, int offset, int limit) {
         PagerVO pagerVO = new PagerVO(0L, null);
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processKey).startedBy(userIdentity);
         long total = historicProcessInstanceQuery.count();
