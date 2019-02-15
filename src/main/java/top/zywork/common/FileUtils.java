@@ -175,6 +175,15 @@ public class FileUtils {
     }
 
     /**
+     * 删除指定路径的文件
+     * @param path
+     */
+    public static void deleteFile(String path) {
+        File file = new File(path);
+        file.delete();
+    }
+
+    /**
      * 删除指定的目录，该目录下的所有文件和目录也会删除
      * @param srcDir 需要删除的目录
      */
