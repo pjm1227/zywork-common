@@ -114,7 +114,7 @@ public class ActivitiUtils {
     @SuppressWarnings({"unchecked"})
     public static PagerVO listDeployments(RepositoryService repositoryService, String processName, int offset, int limit) {
         PagerVO pagerVO = new PagerVO(0L, null);
-        DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery().deploymentName(processName);
+        DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery().deploymentNameLike(processName);
         long total = deploymentQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);
@@ -132,7 +132,7 @@ public class ActivitiUtils {
      * @return 指定流程名的最新版本的流程部署对象
      */
     public static Deployment getLatestDeployment(RepositoryService repositoryService, String processKey) {
-        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().deploymentKey(processKey).latest().list();
+        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().deploymentKeyLike(processKey).latest().list();
         return (deploymentList != null && deploymentList.size() > 0) ? deploymentList.get(0) : null;
     }
 
@@ -143,7 +143,7 @@ public class ActivitiUtils {
      * @param processKey       流程名
      */
     public static int removeAllDeployment(RepositoryService repositoryService, String processKey) {
-        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().processDefinitionKey(processKey).list();
+        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().processDefinitionKeyLike(processKey).list();
         int count = deploymentList.size();
         for (Deployment deployment : deploymentList) {
             repositoryService.deleteDeployment(deployment.getId(), true);
@@ -158,7 +158,7 @@ public class ActivitiUtils {
      * @param processKey       流程名
      */
     public static int removeOldDeployment(RepositoryService repositoryService, String processKey) {
-        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().processDefinitionKey(processKey).orderByDeploymentId().desc().list();
+        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().processDefinitionKeyLike(processKey).orderByDeploymentId().desc().list();
         int count = deploymentList.size();
         if (deploymentList.size() > 0) {
             deploymentList.remove(0);
@@ -202,7 +202,7 @@ public class ActivitiUtils {
     @SuppressWarnings({"unchecked"})
     public static PagerVO listProcessDefinitions(RepositoryService repositoryService, String processName, int offset, int limit) {
         PagerVO pagerVO = new PagerVO(0L, null);
-        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().processDefinitionName(processName);
+        ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike(processName);
         long total = processDefinitionQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);
@@ -220,7 +220,7 @@ public class ActivitiUtils {
      * @return 指定流程名的最新版本的流程定义对象
      */
     public static ProcessDefinition getLatestProcessDefinition(RepositoryService repositoryService, String processKey) {
-        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processKey).latestVersion().list();
+        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(processKey).latestVersion().list();
         return (processDefinitionList != null && processDefinitionList.size() > 0) ? processDefinitionList.get(0) : null;
     }
 
