@@ -132,7 +132,7 @@ public class ActivitiUtils {
      * @return 指定流程名的最新版本的流程部署对象
      */
     public static Deployment getLatestDeployment(RepositoryService repositoryService, String processKey) {
-        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().deploymentKeyLike(processKey).latest().list();
+        List<Deployment> deploymentList = repositoryService.createDeploymentQuery().deploymentKey(processKey).latest().list();
         return (deploymentList != null && deploymentList.size() > 0) ? deploymentList.get(0) : null;
     }
 
@@ -220,7 +220,7 @@ public class ActivitiUtils {
      * @return 指定流程名的最新版本的流程定义对象
      */
     public static ProcessDefinition getLatestProcessDefinition(RepositoryService repositoryService, String processKey) {
-        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionKeyLike(processKey).latestVersion().list();
+        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processKey).latestVersion().list();
         return (processDefinitionList != null && processDefinitionList.size() > 0) ? processDefinitionList.get(0) : null;
     }
 
@@ -536,11 +536,13 @@ public class ActivitiUtils {
      *
      * @param repositoryService RepositoryService实例
      * @param processKey       流程名
+     * @param version 流程版本号
      * @return 原始流程图片
      */
-    public static InputStream getDiagramPNG(RepositoryService repositoryService, String processKey) {
-        ProcessDefinition processDefinition = getLatestProcessDefinition(repositoryService, processKey);
-        if (processDefinition != null) {
+    public static InputStream getDiagramPNG(RepositoryService repositoryService, String processKey, Integer version) {
+        List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processKey).processDefinitionVersion(version).list();
+        if (processDefinitionList != null && processDefinitionList.size() > 0) {
+            ProcessDefinition processDefinition = processDefinitionList.get(0);
             return repositoryService.getResourceAsStream(processDefinition.getDeploymentId(), processDefinition.getDiagramResourceName());
         } else {
             return null;
@@ -554,28 +556,31 @@ public class ActivitiUtils {
      * @param runtimeService    RuntimeService实例
      * @param repositoryService RepositoryService实例
      * @param processInstanceId 流程实例编号
-     * @param processKey       流程名
      * @return 标识出当前任务节点的流程图
      */
-    public static InputStream generateDiagramPNG(ProcessEngine processEngine, RuntimeService runtimeService, RepositoryService repositoryService, String processInstanceId, String processKey) {
+    public static InputStream generateDiagramPNG(ProcessEngine processEngine, RuntimeService runtimeService, RepositoryService repositoryService, String processInstanceId) {
         List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
-        List<String> activityIds = new ArrayList<>();
-        for (Execution execution : executions) {
-            activityIds.addAll(runtimeService.getActiveActivityIds(execution.getId()));
-        }
-        if (activityIds.size() > 0) {
-            ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
-            return new DefaultProcessDiagramGenerator().generateDiagram(
-                    repositoryService.getBpmnModel(getLatestProcessDefinition(repositoryService, processKey).getId()),
-                    "png",
-                    activityIds,
-                    Collections.emptyList(),
-                    processEngineConfiguration.getActivityFontName(),
-                    processEngineConfiguration.getLabelFontName(),
-                    processEngineConfiguration.getAnnotationFontName(),
-                    processEngineConfiguration.getClassLoader(),
-                    1.0
-            );
+        List<ProcessInstance> processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).list();
+        if (processInstanceList != null && processInstanceList.size() > 0) {
+            ProcessInstance processInstance = processInstanceList.get(0);
+            List<String> activityIds = new ArrayList<>();
+            for (Execution execution : executions) {
+                activityIds.addAll(runtimeService.getActiveActivityIds(execution.getId()));
+            }
+            if (activityIds.size() > 0) {
+                ProcessEngineConfiguration processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+                return new DefaultProcessDiagramGenerator().generateDiagram(
+                        repositoryService.getBpmnModel(processInstance.getProcessDefinitionId()),
+                        "png",
+                        activityIds,
+                        Collections.emptyList(),
+                        processEngineConfiguration.getActivityFontName(),
+                        processEngineConfiguration.getLabelFontName(),
+                        processEngineConfiguration.getAnnotationFontName(),
+                        processEngineConfiguration.getClassLoader(),
+                        1.0
+                );
+            }
         }
         return null;
     }
