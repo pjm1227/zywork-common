@@ -1,5 +1,6 @@
 {
   "accessKeyId": "yourAccessKeyId",
   "accessKeySecret": "yourAccessKeySecret",
-  "signName": "signName"
+  "signName": "signName",
+  "regionId": "cn-hangzhou"
 }

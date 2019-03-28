@@ -8,4 +8,18 @@ package top.zywork.ali;
  * @version 1.0
  */
 public class AliyunMailConfig extends AliyunBaseConfig {
+
+    /**
+     * 可用区
+     */
+    private String regionId;
+
+    public String getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
+    }
+
 }

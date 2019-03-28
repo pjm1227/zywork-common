@@ -35,13 +35,7 @@ public class AliyunSmsUtils {
      * @throws ClientException
      */
     public static SendSmsResponse sendSms(AliyunSmsConfig aliyunSmsConfig, String phoneNumbers, String templateCode, String templateParam, String outId) throws ClientException {
-        //可自助调整超时时间
-        System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
-        System.setProperty("sun.net.client.defaultReadTimeout", "10000");
-        //初始化acsClient,暂不支持region化
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", aliyunSmsConfig.getAccessKeyId(), aliyunSmsConfig.getAccessKeySecret());
-        DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
-        IAcsClient acsClient = new DefaultAcsClient(profile);
+        IAcsClient acsClient = getClient(aliyunSmsConfig);
         //组装请求对象-具体描述见控制台-文档部分内容
         SendSmsRequest request = new SendSmsRequest();
         request.setPhoneNumbers(phoneNumbers);
@@ -73,13 +67,7 @@ public class AliyunSmsUtils {
      * @throws ClientException
      */
     public static QuerySendDetailsResponse querySendDetails(AliyunSmsConfig aliyunSmsConfig, String phoneNumber, String bizId, String date, Long pageNo, Long pageSize) throws ClientException {
-        //可自助调整超时时间
-        System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
-        System.setProperty("sun.net.client.defaultReadTimeout", "10000");
-        //初始化acsClient,暂不支持region化
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", aliyunSmsConfig.getAccessKeyId(), aliyunSmsConfig.getAccessKeySecret());
-        DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
-        IAcsClient acsClient = new DefaultAcsClient(profile);
+        IAcsClient acsClient = getClient(aliyunSmsConfig);
         //组装请求对象
         QuerySendDetailsRequest request = new QuerySendDetailsRequest();
         request.setPhoneNumber(phoneNumber);
@@ -92,6 +80,16 @@ public class AliyunSmsUtils {
         //hint 此处可能会抛出异常，注意catch
         QuerySendDetailsResponse querySendDetailsResponse = acsClient.getAcsResponse(request);
         return querySendDetailsResponse;
+    }
+
+    private static IAcsClient getClient(AliyunSmsConfig aliyunSmsConfig) throws ClientException {
+        //可自助调整超时时间
+        System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
+        System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+        //初始化acsClient,暂不支持region化
+        IClientProfile profile = DefaultProfile.getProfile(aliyunSmsConfig.getRegionId(), aliyunSmsConfig.getAccessKeyId(), aliyunSmsConfig.getAccessKeySecret());
+        DefaultProfile.addEndpoint(aliyunSmsConfig.getRegionId(), aliyunSmsConfig.getRegionId(), product, domain);
+        return new DefaultAcsClient(profile);
     }
 
     public static void main(String[] args) throws ClientException, InterruptedException {
@@ -130,6 +128,6 @@ public class AliyunSmsUtils {
             System.out.println("TotalCount=" + querySendDetailsResponse.getTotalCount());
             System.out.println("RequestId=" + querySendDetailsResponse.getRequestId());
         }
-
     }
+
 }

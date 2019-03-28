@@ -12,6 +12,11 @@ public class AliyunSmsConfig extends AliyunBaseConfig {
     // 短信签名，必填
     private String signName;
 
+    /**
+     * 可用区
+     */
+    private String regionId;
+
     public AliyunSmsConfig() {}
 
     public AliyunSmsConfig(String accessKeyId, String accessKeySecret, String signName) {
@@ -26,4 +31,14 @@ public class AliyunSmsConfig extends AliyunBaseConfig {
     public void setSignName(String signName) {
         this.signName = signName;
     }
+
+
+    public String getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
+    }
+
 }

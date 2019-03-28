@@ -17,6 +17,7 @@
     <slf4j.version>1.7.25</slf4j.version>
     <fastjson.version>1.2.51</fastjson.version>
     <spring.version>5.0.10.RELEASE</spring.version>
+    <spring-data-redis.version>2.1.1.RELEASE</spring-data-redis.version>
     <httpclient.version>4.5.6</httpclient.version>
     <validation-api.version>2.0.1.Final</validation-api.version>
     <mail.version>1.6.2</mail.version>
@@ -26,6 +27,11 @@
     <quartz.version>2.3.0</quartz.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
     <zxing.version>3.3.3</zxing.version>
+    <wx-pay.version>3.0.9</wx-pay.version>
+    <aliyun-sdk-core.version>4.2.2</aliyun-sdk-core.version>
+    <aliyun-sdk-sms.version>1.1.0</aliyun-sdk-sms.version>
+    <aliyun-sdk-dm.version>3.3.1</aliyun-sdk-dm.version>
+    <aliyum-sdk-oss.version>3.4.2</aliyum-sdk-oss.version>
     <junit.version>4.12</junit.version>
   </properties>
 
@@ -73,7 +79,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
-      <version>2.1.1.RELEASE</version>
+      <version>${spring-data-redis.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -147,7 +153,7 @@
     <dependency>
       <groupId>com.github.wxpay</groupId>
       <artifactId>wxpay-sdk</artifactId>
-      <version>3.0.9</version>
+      <version>${wx-pay.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
@@ -159,21 +165,27 @@
     <dependency>
       <groupId>com.aliyun</groupId>
       <artifactId>aliyun-java-sdk-core</artifactId>
-      <version>4.2.2</version>
+      <version>${aliyun-sdk-core.version}</version>
     </dependency>
 
     <!-- 阿里云短信 -->
     <dependency>
       <groupId>com.aliyun</groupId>
       <artifactId>aliyun-java-sdk-dysmsapi</artifactId>
-      <version>1.1.0</version>
+      <version>${aliyun-sdk-sms.version}</version>
     </dependency>
 
     <!-- 阿里云邮件推送 -->
     <dependency>
       <groupId>com.aliyun</groupId>
       <artifactId>aliyun-java-sdk-dm</artifactId>
-      <version>3.3.1</version>
+      <version>${aliyun-sdk-dm.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.aliyun.oss</groupId>
+      <artifactId>aliyun-sdk-oss</artifactId>
+      <version>${aliyum-sdk-oss.version}</version>
     </dependency>
 
     <dependency>
