@@ -159,6 +159,7 @@ public class AliyunOssUtils {
 
     /**
      * 获取对象元数据
+     *
      * @param ossClient
      * @param bucketName
      * @param objectKey
@@ -169,6 +170,7 @@ public class AliyunOssUtils {
 
     /**
      * 获取对象content type
+     *
      * @param ossClient
      * @param bucketName
      * @param objectKey
@@ -207,6 +209,7 @@ public class AliyunOssUtils {
 
     /**
      * 删除多个key对象
+     *
      * @param ossClient
      * @param bucketName
      * @param objectKeys
@@ -231,7 +234,31 @@ public class AliyunOssUtils {
     }
 
     /**
+     * 生成内网访问url
+     *
+     * @param regionId
+     * @param bucketName
+     * @param objectKey
+     * @return
+     */
+    public static String generateObjectInternalUrl(String regionId, String bucketName, String objectKey) {
+        return "https://" + bucketName + ".oss-" + regionId + "-internal.aliyuncs.com/" + objectKey;
+    }
+
+    /**
+     * 使用绑定的域名生成外网访问链接
+     *
+     * @param domain
+     * @param objectKey
+     * @return
+     */
+    public static String generateObjectUrl(String domain, String objectKey) {
+        return domain + "/" + objectKey;
+    }
+
+    /**
      * 生成带有授权信息的链接
+     *
      * @param ossClient
      * @param bucketName
      * @param objectKey

@@ -1,5 +1,6 @@
 {
   "accessKeyId": "yourAccessKeyId",
   "accessKeySecret": "yourAccessKeySecret",
-  "regionId": "cn-hangzhou"
+  "regionId": "cn-hangzhou",
+  "domain": "http://cdn.zywork.top"
 }

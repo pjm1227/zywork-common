@@ -14,12 +14,25 @@ public class AliyunOssConfig extends AliyunBaseConfig {
      */
     private String regionId;
 
+    /**
+     * 绑定的域名
+     */
+    private String domain;
+
     public String getRegionId() {
         return regionId;
     }
 
     public void setRegionId(String regionId) {
         this.regionId = regionId;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
 }
