@@ -32,6 +32,7 @@
     <aliyun-sdk-sms.version>1.1.0</aliyun-sdk-sms.version>
     <aliyun-sdk-dm.version>3.3.1</aliyun-sdk-dm.version>
     <aliyum-sdk-oss.version>3.4.2</aliyum-sdk-oss.version>
+    <qiniu-sdk.version>7.2.18</qiniu-sdk.version>
     <junit.version>4.12</junit.version>
   </properties>
 
@@ -186,6 +187,12 @@
       <groupId>com.aliyun.oss</groupId>
       <artifactId>aliyun-sdk-oss</artifactId>
       <version>${aliyum-sdk-oss.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.qiniu</groupId>
+      <artifactId>qiniu-java-sdk</artifactId>
+      <version>${qiniu-sdk.version}</version>
     </dependency>
 
     <dependency>

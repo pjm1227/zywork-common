@@ -206,6 +206,19 @@ public class AliyunOssUtils {
     }
 
     /**
+     * 删除多个key对象
+     * @param ossClient
+     * @param bucketName
+     * @param objectKeys
+     * @return
+     */
+    public static DeleteObjectsResult deleteObjects(OSSClient ossClient, String bucketName, List<String> objectKeys) {
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName);
+        deleteObjectsRequest.setKeys(objectKeys);
+        return ossClient.deleteObjects(deleteObjectsRequest);
+    }
+
+    /**
      * 生成外网访问url
      *
      * @param regionId
@@ -217,8 +230,16 @@ public class AliyunOssUtils {
         return "https://" + bucketName + ".oss-" + regionId + ".aliyuncs.com/" + objectKey;
     }
 
-    public static String generatePresignedUrl(OSSClient ossClient, String bucketName, String objectKey) {
-        return ossClient.generatePresignedUrl(bucketName, objectKey, DateUtils.millisToDate(DateUtils.currentTimeMillis() + 100L * 365 * 24 * 60 * 60 * 1000)).toString();
+    /**
+     * 生成带有授权信息的链接
+     * @param ossClient
+     * @param bucketName
+     * @param objectKey
+     * @param expireInMillis 过期时间，单位为ms
+     * @return
+     */
+    public static String generatePresignedUrl(OSSClient ossClient, String bucketName, String objectKey, long expireInMillis) {
+        return ossClient.generatePresignedUrl(bucketName, objectKey, DateUtils.millisToDate(DateUtils.currentTimeMillis() + expireInMillis)).toString();
     }
 
 }

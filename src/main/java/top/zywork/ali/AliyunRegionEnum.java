@@ -1,6 +1,5 @@
 package top.zywork.ali;
 
-
 /**
  * 阿里云可用区枚举<br/>
  * 创建于2019-03-28<br/>
