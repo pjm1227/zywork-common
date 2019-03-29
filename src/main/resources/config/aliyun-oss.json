@@ -2,5 +2,6 @@
   "accessKeyId": "yourAccessKeyId",
   "accessKeySecret": "yourAccessKeySecret",
   "regionId": "cn-hangzhou",
-  "domain": "http://cdn.zywork.top"
+  "domain": "http://cdn.zywork.top",
+  "defaultBucket": "defaultBucket"
 }

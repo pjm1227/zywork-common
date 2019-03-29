@@ -2,5 +2,6 @@
   "accessKey": "accessKey",
   "secretKey": "secretKey",
   "zoneName": "zone0",
-  "domain": "http://cdn.zywork.top"
+  "domain": "http://cdn.zywork.top",
+  "defaultBucket": "defaultBucket"
 }

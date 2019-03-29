@@ -98,9 +98,8 @@ public class AliyunOssUtils {
      * @param file
      * @return
      */
-    public static String putFile(OSSClient ossClient, String bucketName, String objectKey, File file) {
-        PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectKey, file);
-        return putObjectResult.getETag();
+    public static PutObjectResult putFile(OSSClient ossClient, String bucketName, String objectKey, File file) {
+        return ossClient.putObject(bucketName, objectKey, file);
     }
 
     /**
@@ -112,9 +111,8 @@ public class AliyunOssUtils {
      * @param inputStream
      * @return
      */
-    public static String putInputStream(OSSClient ossClient, String bucketName, String objectKey, InputStream inputStream) {
-        PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectKey, inputStream);
-        return putObjectResult.getETag();
+    public static PutObjectResult putInputStream(OSSClient ossClient, String bucketName, String objectKey, InputStream inputStream) {
+        return ossClient.putObject(bucketName, objectKey, inputStream);
     }
 
     /**
@@ -126,15 +124,13 @@ public class AliyunOssUtils {
      * @param url
      * @return
      */
-    public static String putNetworkStream(OSSClient ossClient, String bucketName, String objectKey, String url) {
-        String eTag = null;
+    public static PutObjectResult putNetworkStream(OSSClient ossClient, String bucketName, String objectKey, String url) {
         try {
-            PutObjectResult putObjectResult = ossClient.putObject(bucketName, objectKey, new URL(url).openStream());
-            eTag = putObjectResult.getETag();
+            return ossClient.putObject(bucketName, objectKey, new URL(url).openStream());
         } catch (IOException e) {
             logger.error("error open url: {}", url);
+            return null;
         }
-        return eTag;
     }
 
     /**

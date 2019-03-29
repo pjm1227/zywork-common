@@ -19,6 +19,11 @@ public class AliyunOssConfig extends AliyunBaseConfig {
      */
     private String domain;
 
+    /**
+     * 默认的bucket
+     */
+    private String defaultBucket;
+
     public String getRegionId() {
         return regionId;
     }
@@ -35,4 +40,11 @@ public class AliyunOssConfig extends AliyunBaseConfig {
         this.domain = domain;
     }
 
+    public String getDefaultBucket() {
+        return defaultBucket;
+    }
+
+    public void setDefaultBucket(String defaultBucket) {
+        this.defaultBucket = defaultBucket;
+    }
 }

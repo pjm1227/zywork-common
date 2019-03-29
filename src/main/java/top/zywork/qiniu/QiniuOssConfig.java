@@ -11,6 +11,10 @@ public class QiniuOssConfig extends QiniuBaseConfig {
 
     private String zoneName;
     private String domain;
+    /**
+     * 默认的bucket
+     */
+    private String defaultBucket;
 
     public String getZoneName() {
         return zoneName;
@@ -26,5 +30,13 @@ public class QiniuOssConfig extends QiniuBaseConfig {
 
     public void setDomain(String domain) {
         this.domain = domain;
+    }
+
+    public String getDefaultBucket() {
+        return defaultBucket;
+    }
+
+    public void setDefaultBucket(String defaultBucket) {
+        this.defaultBucket = defaultBucket;
     }
 }
