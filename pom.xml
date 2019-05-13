@@ -13,7 +13,7 @@
 
   <properties>
     <jdk.version>1.8</jdk.version>
-    <tomcat.version>8.5.34</tomcat.version>
+    <tomcat.version>8.5.40</tomcat.version>
     <slf4j.version>1.7.25</slf4j.version>
     <fastjson.version>1.2.51</fastjson.version>
     <spring.version>5.0.10.RELEASE</spring.version>
