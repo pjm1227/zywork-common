@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import top.zywork.constant.FileConstants;
 import top.zywork.enums.MIMETypeEnum;
 import top.zywork.enums.ResponseStatusEnum;
 import top.zywork.vo.ResponseStatusVO;
@@ -138,7 +139,7 @@ public class UploadUtils {
                 // 需要按指定大小压缩
                 for (int[] size : compressSizes) {
                     String uploadFileName = uploadFileName(newFileName, fullExt, size);
-                    String newFilePath = saveDir + File.separator + uploadFileName;
+                    String newFilePath = saveDir + FileConstants.SEPARATOR + uploadFileName;
                     if (MIMETypeEnum.GIF.getExt().equalsIgnoreCase(fullExt)) {
                         // 压缩gif图片
                         ImageCompressUtils.compressGif(newFile.getAbsolutePath(), size[0], size[1], new FileOutputStream(new File(newFilePath)));
@@ -151,7 +152,7 @@ public class UploadUtils {
                 // 需要按指定比例压缩
                 for (float scale : compressScales) {
                     String uploadFileName = uploadFileName(newFileName, fullExt, scale);
-                    String newFilePath = saveDir + File.separator + uploadFileName;
+                    String newFilePath = saveDir + FileConstants.SEPARATOR + uploadFileName;
                     if (MIMETypeEnum.GIF.getExt().equalsIgnoreCase(fullExt)) {
                         // 压缩gif图片
                         ImageCompressUtils.compressGif(newFile.getAbsolutePath(), scale, new FileOutputStream(new File(newFilePath)));

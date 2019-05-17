@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import top.zywork.annotation.ExposeClass;
+import top.zywork.constant.FileConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -184,7 +185,7 @@ public class ReflectUtils {
      */
     public static List<String> getClassNames(String packageName, Boolean recursive, Class<? extends Annotation> annotation) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        packageName = packageName.replace(".",  "/");
+        packageName = packageName.replace(".", FileConstants.SEPARATOR);
         List<String> classNames = new ArrayList<>();
         try {
             Enumeration<URL> urlEnumeration = classLoader.getResources(packageName);
@@ -213,7 +214,7 @@ public class ReflectUtils {
      */
     public static List<Class<?>> getClasses(String packageName, Boolean recursive, Class<? extends Annotation> annotation) {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        packageName = packageName.replace(".", "/");
+        packageName = packageName.replace(".", FileConstants.SEPARATOR);
         List<Class<?>> classes = new ArrayList<>();
         try {
             Enumeration<URL> urlEnumeration = classLoader.getResources(packageName);
@@ -413,15 +414,17 @@ public class ReflectUtils {
     public static List<String> getExposeClassNames(String packageName, Boolean recursive, String type) {
         List<Class<?>> classes = getClasses(packageName, recursive, ExposeClass.class);
         List<String> classNames = new ArrayList<>();
-        if (StringUtils.isEmpty(type)) {
-            for (Class<?> clazz : classes) {
-                classNames.add(clazz.getName());
-            }
-        } else {
-            for (Class<?> clazz : classes) {
-                ExposeClass exposeClass = clazz.getDeclaredAnnotation(ExposeClass.class);
-                if (type.equals(exposeClass.type())) {
+        if (classes != null && classes.size() > 0) {
+            if (StringUtils.isEmpty(type)) {
+                for (Class<?> clazz : classes) {
                     classNames.add(clazz.getName());
+                }
+            } else {
+                for (Class<?> clazz : classes) {
+                    ExposeClass exposeClass = clazz.getDeclaredAnnotation(ExposeClass.class);
+                    if (type.equals(exposeClass.type())) {
+                        classNames.add(clazz.getName());
+                    }
                 }
             }
         }

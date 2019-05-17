@@ -13,6 +13,7 @@ import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
 import top.zywork.constant.BPMNConstants;
+import top.zywork.constant.FileConstants;
 import top.zywork.vo.PagerVO;
 
 import java.io.File;
@@ -64,7 +65,7 @@ public class ActivitiUtils {
      * @return
      */
     public static Deployment deployByName(RepositoryService repositoryService, String processDir, String processName, String processKey) {
-        return deployByPath(repositoryService, processDir + File.separator+ processName + BPMNConstants.SUFFIX_ZIP, processName, processKey);
+        return deployByPath(repositoryService, processDir + FileConstants.SEPARATOR+ processName + BPMNConstants.SUFFIX_ZIP, processName, processKey);
     }
 
     /**
