@@ -1,8 +1,7 @@
 package top.zywork.common;
 
 import com.alibaba.fastjson.JSON;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import top.zywork.enums.CharsetEnum;
 
 import java.io.*;
@@ -15,9 +14,8 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class IOUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
 
     /**
      * 获取指定文件内的所有字符文本内容
@@ -29,7 +27,7 @@ public class IOUtils {
         try {
             return getText(new FileInputStream(path), charsetName);
         } catch (FileNotFoundException e) {
-            logger.error("file {} not found error: {}", path, e.getMessage());
+            log.error("file {} not found error: {}", path, e.getMessage());
         }
         return null;
     }
@@ -51,23 +49,13 @@ public class IOUtils {
      */
     public static String getText(InputStream inputStream, String charsetName) {
         StringBuilder text = new StringBuilder();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(inputStream, charsetName));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, charsetName))) {
             String str;
             while ((str = reader.readLine()) != null) {
                 text.append(str).append("\r\n");
             }
         } catch (IOException e) {
-            logger.error("read text file from input stream error: {}", e.getMessage());
-        } finally {
-            if (reader !=  null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    logger.error("buffered reader close error: {}", e.getMessage());
-                }
-            }
+            log.error("read text file from input stream error: {}", e.getMessage());
         }
         return text.toString();
     }
@@ -88,22 +76,10 @@ public class IOUtils {
      * @param charsetName 编码名称
      */
     public static void writeText(String text, String filePath, String charsetName) {
-        BufferedWriter bufferedWriter = null;
-        try {
-            bufferedWriter = new BufferedWriter(
-                    new OutputStreamWriter(
-                            new FileOutputStream(filePath), charsetName));
+        try (BufferedWriter bufferedWriter = new BufferedWriter( new OutputStreamWriter(new FileOutputStream(filePath), charsetName))) {
             bufferedWriter.write(text);
         } catch (IOException e) {
-            logger.error(e.getMessage());
-        } finally {
-            try {
-                if (bufferedWriter != null) {
-                    bufferedWriter.close();
-                }
-            } catch (IOException e) {
-                logger.error("write text to file error: {}", e.getMessage());
-            }
+            log.error("write text to file error: {}", e.getMessage());
         }
     }
 
@@ -125,7 +101,7 @@ public class IOUtils {
         try {
             return getData(new FileInputStream(new File(path)));
         } catch (FileNotFoundException e) {
-            logger.error("file {} not found error: {}", path, e.getMessage());
+            log.error("file {} not found error: {}", path, e.getMessage());
         }
         return null;
     }
@@ -136,15 +112,13 @@ public class IOUtils {
      * @return 输入流对应的字节数组数据
      */
     public static byte[] getData(InputStream inputStream) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        inputToOutput(inputStream, outputStream);
-        byte[] bytes = outputStream.toByteArray();
-        try {
-            outputStream.close();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            inputToOutput(inputStream, outputStream);
+            return outputStream.toByteArray();
         } catch (IOException e) {
-            logger.error("byte array output stream close error: {}", e.getMessage());
+            log.error("byte array output stream error: {}", e.getMessage());
         }
-        return bytes;
+        return null;
     }
 
     /**
@@ -153,12 +127,10 @@ public class IOUtils {
      * @param outputStream 输出流对象
      */
     public static void inputToOutput(String path, OutputStream outputStream) {
-        try {
-            InputStream inputStream = new FileInputStream(new File(path));
+        try (InputStream inputStream = new FileInputStream(new File(path))) {
             inputToOutput(inputStream, outputStream);
-            inputStream.close();
         } catch (IOException e) {
-            logger.error("read file {} to output stream error: {}", path, e.getMessage());
+            log.error("read file {} to output stream error: {}", path, e.getMessage());
         }
     }
 
@@ -174,7 +146,7 @@ public class IOUtils {
                 outputStream.write(bytes, 0, length);
             }
         } catch (IOException e) {
-            logger.error("read input stream to output stream error: {}", e.getMessage());
+            log.error("read input stream to output stream error: {}", e.getMessage());
         }
     }
 

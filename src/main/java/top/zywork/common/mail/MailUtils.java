@@ -1,8 +1,7 @@
 package top.zywork.common.mail;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import top.zywork.common.ConfigUtils;
+import lombok.extern.slf4j.Slf4j;
+import top.zywork.common.PropertiesUtils;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,9 +20,8 @@ import java.util.Properties;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class MailUtils {
-
-	private static final Logger logger = LoggerFactory.getLogger(MailUtils.class);
 
 	/**
 	 * 邮箱用户名，为邮箱地址
@@ -43,16 +41,14 @@ public class MailUtils {
 	 * @param mail Mail邮件对象
 	 */
 	public static void sendMail(String mailConfigPath, Mail mail) {
-		ConfigUtils configUtils = new ConfigUtils();
+		PropertiesUtils propertiesUtils = new PropertiesUtils();
 		Properties props = propsMap.get(mailConfigPath);
 		if (props == null) {
-			props = configUtils.build(mailConfigPath);
+			props = propertiesUtils.read(mailConfigPath);
 			propsMap.put(mailConfigPath, props);
 		}
-		Session session = Session.getInstance(props,
-				new MailAuthenticator(configUtils.getString(USERNAME),
-						configUtils.getString(PASSWORD)));
-		mail.setFrom(new MailAccount(configUtils.getString(USERNAME)));
+		Session session = Session.getInstance(props, new MailAuthenticator(propertiesUtils.getString(USERNAME), propertiesUtils.getString(PASSWORD)));
+		mail.setFrom(MailAccount.builder().address(propertiesUtils.getString(USERNAME)).build());
 		try {
 			Transport transport = session.getTransport();
 			transport.connect();
@@ -60,7 +56,7 @@ public class MailUtils {
 			transport.sendMessage(msg, msg.getAllRecipients());
 			transport.close();
 		} catch (MessagingException e) {
-			logger.error("send mail error: {}", e.getMessage());
+			log.error("send mail error: {}", e.getMessage());
 		}
 	}
 

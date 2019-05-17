@@ -8,6 +8,7 @@ package top.zywork.qiniu;
  * @version 1.0
  */
 public enum QiniuZoneEnum {
+
     ZONE0("zone0", "华东"),
     ZONE1("zone1", "华北"),
     ZONE2("zone2", "华南"),
@@ -37,4 +38,5 @@ public enum QiniuZoneEnum {
     public void setLocalName(String localName) {
         this.localName = localName;
     }
+
 }

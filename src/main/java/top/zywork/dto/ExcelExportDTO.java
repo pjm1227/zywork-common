@@ -1,5 +1,10 @@
 package top.zywork.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
@@ -10,6 +15,10 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ExcelExportDTO extends BaseDTO {
 
     private static final long serialVersionUID = 5585817536271021363L;
@@ -20,43 +29,4 @@ public class ExcelExportDTO extends BaseDTO {
     private String[] properties;
     private List<Object> rows;
 
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String[] getColumnNames() {
-        return columnNames;
-    }
-
-    public void setColumnNames(String[] columnNames) {
-        this.columnNames = columnNames;
-    }
-
-    public String[] getProperties() {
-        return properties;
-    }
-
-    public void setProperties(String[] properties) {
-        this.properties = properties;
-    }
-
-    public List<Object> getRows() {
-        return rows;
-    }
-
-    public void setRows(List<Object> rows) {
-        this.rows = rows;
-    }
 }

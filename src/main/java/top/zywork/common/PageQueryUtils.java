@@ -1,5 +1,6 @@
 package top.zywork.common;
 
+import org.apache.commons.lang3.StringUtils;
 import top.zywork.query.PageQuery;
 
 /**
@@ -24,13 +25,10 @@ public class PageQueryUtils {
      * @return PageQuery对象
      */
     public static PageQuery getPageQuery(int pageNo, int pageSize) {
-        if (pageNo <= 0) {
-            pageNo = 1;
-        }
-        if (pageSize <= 0) {
-            pageSize = DEFAULT_PAGE_SIZE;
-        }
-        return new PageQuery(pageNo, pageSize, "", "");
+        PageQuery pageQuery = new PageQuery();
+        pageQuery.setPageNo(pageNo);
+        pageQuery.setPageSize(pageSize);
+        return pageQuery;
     }
 
     /**
@@ -49,10 +47,15 @@ public class PageQueryUtils {
      * @return PageQuery对象
      */
     public static PageQuery getPageQuery(String pageNo, String pageSize) {
-        if (pageNo != null && pageSize != null) {
+        if (StringUtils.isNotEmpty(pageNo) && StringUtils.isNotEmpty(pageSize)) {
             return getPageQuery(Integer.valueOf(pageNo), Integer.valueOf(pageSize));
+        } else if (StringUtils.isNotEmpty(pageNo)) {
+            return getPageQuery(Integer.valueOf(pageNo));
+        } else if (StringUtils.isNotEmpty(pageSize)) {
+            return getPageQuery(1, Integer.valueOf(pageSize));
+        } else {
+            return getPageQuery(1);
         }
-        return getPageQuery(1);
     }
 
 }

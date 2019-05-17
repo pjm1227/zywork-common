@@ -11,4 +11,9 @@ import java.io.Serializable;
  */
 public class BaseQuery implements Serializable {
     private static final long serialVersionUID = -103627828371415217L;
+
+    @Override
+    public String toString() {
+        return "BaseQuery{}";
+    }
 }

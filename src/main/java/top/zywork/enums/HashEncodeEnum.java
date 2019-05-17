@@ -26,4 +26,5 @@ public enum HashEncodeEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

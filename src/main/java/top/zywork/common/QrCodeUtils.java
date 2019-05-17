@@ -6,9 +6,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import top.zywork.enums.CharsetEnum;
 
 import javax.imageio.ImageIO;
@@ -30,9 +29,8 @@ import java.util.Map;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class QrCodeUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(QrCodeUtils.class);
 
     private static final int QR_COLOR = 0x000000;
 
@@ -70,7 +68,7 @@ public class QrCodeUtils {
             BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, encodeHintsMap);
             return MatrixToImageWriter.toBufferedImage(bitMatrix);
         } catch (WriterException e) {
-            logger.error("qr code encode error: {}", e.getMessage());
+            log.error("qr code encode error: {}", e.getMessage());
         }
         return null;
     }
@@ -101,7 +99,7 @@ public class QrCodeUtils {
         try {
             return generateQrCode(text, width, height, ImageIO.read(logo), null, null, null);
         } catch (IOException e) {
-            logger.error("read image file error: {}", e.getMessage());
+            log.error("read image file error: {}", e.getMessage());
         }
         return null;
     }
@@ -121,7 +119,7 @@ public class QrCodeUtils {
         try {
             return generateQrCode(text, width, height, ImageIO.read(logo), remark, remarkColor, remarkFont);
         } catch (IOException e) {
-            logger.error("read image file error: {}", e.getMessage());
+            log.error("read image file error: {}", e.getMessage());
         }
         return null;
     }
@@ -138,7 +136,7 @@ public class QrCodeUtils {
         try {
             return generateQrCode(text, width, height, ImageIO.read(new URL(logoUrl)), null, null, null);
         } catch (IOException e) {
-            logger.error("read image from url error: {}", e.getMessage());
+            log.error("read image from url error: {}", e.getMessage());
         }
         return null;
     }
@@ -158,7 +156,7 @@ public class QrCodeUtils {
         try {
             return generateQrCode(text, width, height, ImageIO.read(new URL(logoUrl)), remark, remarkColor, remarkFont);
         } catch (IOException e) {
-            logger.error("read image from url error: {}", e.getMessage());
+            log.error("read image from url error: {}", e.getMessage());
         }
         return null;
     }
@@ -216,7 +214,7 @@ public class QrCodeUtils {
             }
             return bufferedImage;
         } catch (WriterException e) {
-            logger.error("qr code encode error: {}", e.getMessage());
+            log.error("qr code encode error: {}", e.getMessage());
         }
         return null;
     }
@@ -234,7 +232,7 @@ public class QrCodeUtils {
             BitMatrix bitMatrix = new MultiFormatWriter().encode(text, BarcodeFormat.QR_CODE, width, height, encodeHintsMap);
             MatrixToImageWriter.writeToPath(bitMatrix, FileUtils.getExt(fileName), FileSystems.getDefault().getPath(filePath, fileName));
         } catch (WriterException | IOException e) {
-            logger.error("qr code encode error: {}", e.getMessage());
+            log.error("qr code encode error: {}", e.getMessage());
         }
     }
 
@@ -256,7 +254,7 @@ public class QrCodeUtils {
                 ImageIO.write(bufferedImage, FileUtils.getExt(fileName), new File(filePath, fileName));
             }
         } catch (IOException e) {
-            logger.error("qr code encode error: {}", e.getMessage());
+            log.error("qr code encode error: {}", e.getMessage());
         }
     }
 
@@ -276,7 +274,7 @@ public class QrCodeUtils {
                 ImageIO.write(bufferedImage, FileUtils.getExt(fileName), new File(filePath, fileName));
             }
         } catch (IOException e) {
-            logger.error("qr code encode error: {}", e.getMessage());
+            log.error("qr code encode error: {}", e.getMessage());
         }
     }
 
@@ -299,7 +297,7 @@ public class QrCodeUtils {
                 ImageIO.write(bufferedImage, FileUtils.getExt(fileName), new File(filePath, fileName));
             }
         } catch (IOException e) {
-            logger.error("qr code encode error: {}", e.getMessage());
+            log.error("qr code encode error: {}", e.getMessage());
         }
     }
 
@@ -315,7 +313,7 @@ public class QrCodeUtils {
             Result result = new MultiFormatReader().decode(bitmap, decodeHintsMap);
             return result != null ? result.getText() : null;
         } catch (NotFoundException e) {
-            logger.error("decode qr code error: {}", e.getMessage());
+            log.error("decode qr code error: {}", e.getMessage());
         }
         return null;
     }
@@ -329,7 +327,7 @@ public class QrCodeUtils {
         try {
             return decodeQrCode(ImageIO.read(new File(imgPath)));
         } catch (Exception e) {
-            logger.error("read image from path error: {}", e.getMessage());
+            log.error("read image from path error: {}", e.getMessage());
         }
         return null;
     }
@@ -343,7 +341,7 @@ public class QrCodeUtils {
         try {
             return decodeQrCode(ImageIO.read(new URL(imgUrl)));
         } catch (Exception e) {
-            logger.error("read image from url error: {}", e.getMessage());
+            log.error("read image from url error: {}", e.getMessage());
         }
         return null;
     }

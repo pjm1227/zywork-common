@@ -74,7 +74,7 @@ public interface BaseService {
     Integer getVersionById(Serializable id);
 
     /**
-     * 根据主体表id查找数据，针对关联表查询
+     * 根据主体表id查找关联表数据
      * @param id 主体表主键字段值
      * @return 关联数据的记录所组成的PagerDTO
      */

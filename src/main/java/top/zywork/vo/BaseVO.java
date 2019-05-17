@@ -11,4 +11,9 @@ import java.io.Serializable;
  */
 public class BaseVO implements Serializable {
     private static final long serialVersionUID = -3018149472984622809L;
+
+    @Override
+    public String toString() {
+        return "BaseVO{}";
+    }
 }

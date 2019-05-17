@@ -1,10 +1,9 @@
 package top.zywork.common;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.dto.ExcelImportDTO;
 
 import java.io.IOException;
@@ -23,9 +22,8 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class ExcelImportUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExcelImportUtils.class);
 
     /**
      * 从Excel的Workbook对象中读取数据并导入到内存中
@@ -51,7 +49,7 @@ public class ExcelImportUtils {
             }
 
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-            logger.error("import data from workbook error: {}", e.getMessage());
+            log.error("import data from workbook error: {}", e.getMessage());
         }
         return rows;
     }
@@ -86,7 +84,7 @@ public class ExcelImportUtils {
                 return excelUtils.getBigDecimalCellValueAt(sheet, rowNo, colNo);
             }
         } catch (NoSuchFieldException e) {
-            logger.error("read cell value for field error: {}", e.getMessage());
+            log.error("read cell value for field error: {}", e.getMessage());
         }
         return null;
     }
@@ -100,7 +98,7 @@ public class ExcelImportUtils {
         try {
             return JSON.parseObject(jsonInput, ExcelImportDTO.class);
         } catch (IOException e) {
-            logger.error("build import dto from input stream error: {}", e.getMessage());
+            log.error("build import dto from input stream error: {}", e.getMessage());
         }
         return null;
     }

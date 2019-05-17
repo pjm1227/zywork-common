@@ -1,9 +1,8 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import top.zywork.enums.HashAlgorithmEnum;
+import lombok.extern.slf4j.Slf4j;
 import top.zywork.enums.CharsetEnum;
+import top.zywork.enums.HashAlgorithmEnum;
 import top.zywork.enums.HashEncodeEnum;
 
 import java.io.UnsupportedEncodingException;
@@ -19,10 +18,9 @@ import java.security.NoSuchAlgorithmException;
  * @version 1.1
  * @see HashAlgorithmEnum
  */
+@Slf4j
 public class HashUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(HashUtils.class);
-
+    
     /**
      * 不使用盐值的md5加密
      * @param str 明文
@@ -34,7 +32,7 @@ public class HashUtils {
         try {
             encryptStr = oneWayEncrypt(str, "",  HashAlgorithmEnum.MD5.getValue(), hashEncodeEnum);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("md5 hash error: {}", e.getMessage());
+            log.error("md5 hash error: {}", e.getMessage());
         }
         return encryptStr;
     }
@@ -51,7 +49,7 @@ public class HashUtils {
         try {
             encryptStr = oneWayEncrypt(str, salt, HashAlgorithmEnum.MD5.getValue(), hashEncodeEnum);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("md5 hash error: {}", e.getMessage());
+            log.error("md5 hash error: {}", e.getMessage());
         }
         return encryptStr;
     }
@@ -67,7 +65,7 @@ public class HashUtils {
         try {
             encryptStr = oneWayEncrypt(str, "", HashAlgorithmEnum.SHA1.getValue(), hashEncodeEnum);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("sha1 hash error: {}", e.getMessage());
+            log.error("sha1 hash error: {}", e.getMessage());
         }
         return encryptStr;
     }
@@ -84,7 +82,7 @@ public class HashUtils {
         try {
             encryptStr = oneWayEncrypt(str, salt,  HashAlgorithmEnum.SHA1.getValue(), hashEncodeEnum);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("sha1 hash error: {}", e.getMessage());
+            log.error("sha1 hash error: {}", e.getMessage());
         }
         return encryptStr;
     }
@@ -100,7 +98,7 @@ public class HashUtils {
         try {
             encryptStr = oneWayEncrypt(str, "", HashAlgorithmEnum.SHA256.getValue(), hashEncodeEnum);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("sha256 hash error: {}", e.getMessage());
+            log.error("sha256 hash error: {}", e.getMessage());
         }
         return encryptStr;
     }
@@ -117,7 +115,7 @@ public class HashUtils {
         try {
             encryptStr = oneWayEncrypt(str, salt,  HashAlgorithmEnum.SHA256.getValue(), hashEncodeEnum);
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            logger.error("sha256 hash error: {}", e.getMessage());
+            log.error("sha256 hash error: {}", e.getMessage());
         }
         return encryptStr;
     }

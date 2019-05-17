@@ -30,7 +30,7 @@ public class AuthUtils {
      */
     public static String generateSignature(final Map<String, String> data, String signType) {
         Set<String> keySet = data.keySet();
-        String[] keyArray = keySet.toArray(new String[keySet.size()]);
+        String[] keyArray = keySet.toArray(new String[0]);
         Arrays.sort(keyArray);
         StringBuilder sb = new StringBuilder();
         for (String key : keyArray) {

@@ -27,4 +27,5 @@ public enum CharsetEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

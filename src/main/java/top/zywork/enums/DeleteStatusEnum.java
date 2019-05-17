@@ -35,4 +35,5 @@ public enum DeleteStatusEnum {
     public void setDes(String des) {
         this.des = des;
     }
+
 }

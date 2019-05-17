@@ -9,7 +9,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 阿里云短信接口工具类，包含发送短信，查询发送详情<br/>
@@ -93,7 +93,10 @@ public class AliyunSmsUtils {
     }
 
     public static void main(String[] args) throws ClientException, InterruptedException {
-        AliyunSmsConfig aliyunSmsConfig = new AliyunSmsConfig("accessKeyId", "accessKeySecret", "signName");
+        AliyunSmsConfig aliyunSmsConfig = new AliyunSmsConfig();
+        aliyunSmsConfig.setAccessKeyId("accessKeyId");
+        aliyunSmsConfig.setAccessKeySecret("accessKeySecret");
+        aliyunSmsConfig.setSignName("signName");
         //发短信
         SendSmsResponse response = sendSms(aliyunSmsConfig,"15000000000", "SMS_1000000",
                 "{\"name\":\"Tom\", \"code\":\"123\"}", null);

@@ -24,7 +24,7 @@ public class UUIDUtils {
      * @return 不带有-的UUID字符串
      */
     public static String simpleUuid() {
-        return uuid().replaceAll("-", "");
+        return uuid().replace("-", "");
     }
 
 }

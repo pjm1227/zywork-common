@@ -1,8 +1,7 @@
 package top.zywork.common.mail;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.enums.CharsetEnum;
 
 import javax.mail.internet.AddressException;
@@ -17,10 +16,9 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class MailAddressUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(MailAddressUtils.class);
-
+    
     /**
      * 把单个MailAccount转成单个InternetAddress
      * @param mailAccount 需要转换的邮箱账号
@@ -33,7 +31,7 @@ public class MailAddressUtils {
             }
             return new InternetAddress(mailAccount.getAddress(), mailAccount.getPersonal(), CharsetEnum.UTF8.getValue());
         } catch (AddressException | UnsupportedEncodingException e) {
-            logger.error("MailAccount to InternetAddress error: {}", e.getMessage());
+            log.error("MailAccount to InternetAddress error: {}", e.getMessage());
         }
         return null;
     }
@@ -54,7 +52,7 @@ public class MailAddressUtils {
                     addressArray[i] = new InternetAddress(mailAccount.getAddress(), mailAccount.getPersonal(), CharsetEnum.UTF8.getValue());
                 }
             } catch (AddressException | UnsupportedEncodingException e) {
-                logger.error("to address array error: {}", e.getMessage());
+                log.error("to address array error: {}", e.getMessage());
             }
         }
         return addressArray;

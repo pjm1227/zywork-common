@@ -2,12 +2,13 @@ package top.zywork.common;
 
 import top.zywork.enums.DatePassEnum;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
 /**
  * 计算多少时间前的工具类<br/>
- * 时间日期等可以考虑使用JDK1.8提供的新API，如Instant, LocalDate, LocalDatetime等<br/>
  * 创建于2018-08-16<br/>
  *
  * @author 王振宇
@@ -45,6 +46,26 @@ public class DatePassUtils {
     }
 
     /**
+     * 两个LocalDateTime相比较的结果
+     * @param past 过去时间的LocalDateTime实例
+     * @param now 现在时间的LocalDateTime实例
+     * @return 计算后得到的x秒前，x分钟前，x小时前，昨天，x天前，或具体的时间
+     */
+    public static String passTime(LocalDateTime past, LocalDateTime now) {
+        return passTime(DateUtils.millis(past), DateUtils.millis(now));
+    }
+
+    /**
+     * 两个Instant相比较的结果
+     * @param past 过去时间的Instant实例
+     * @param now 现在时间的Instant实例
+     * @return 计算后得到的x秒前，x分钟前，x小时前，昨天，x天前，或具体的时间
+     */
+    public static String passTime(Instant past, Instant now) {
+        return passTime(DateUtils.millis(past), DateUtils.millis(now));
+    }
+
+    /**
      * 两个日历相比较的结果
      * @param past 过去时间的Calendar实例
      * @param now 现在时间的Calendar实例
@@ -71,6 +92,15 @@ public class DatePassUtils {
      */
     public static String passTime(long pastTimeMillis) {
         return passTime(pastTimeMillis, Calendar.getInstance().getTimeInMillis());
+    }
+
+    /**
+     * 当前系统时间与过去时间比较的结果
+     * @param past 过去时间的Calendar实例
+     * @return 计算后得到的x秒前，x分钟前，x小时前，昨天，x天前，或具体的时间
+     */
+    public static String passTime(LocalDateTime past) {
+        return passTime(past, LocalDateTime.now());
     }
 
     /**

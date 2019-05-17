@@ -1,5 +1,7 @@
 package top.zywork.ali;
 
+import lombok.*;
+
 /**
  * 阿里云oss配置类<br/>
  * 创建于2019-03-28<br/>
@@ -7,6 +9,12 @@ package top.zywork.ali;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class AliyunOssConfig extends AliyunBaseConfig {
 
     /**
@@ -23,28 +31,4 @@ public class AliyunOssConfig extends AliyunBaseConfig {
      * 默认的bucket
      */
     private String defaultBucket;
-
-    public String getRegionId() {
-        return regionId;
-    }
-
-    public void setRegionId(String regionId) {
-        this.regionId = regionId;
-    }
-
-    public String getDomain() {
-        return domain;
-    }
-
-    public void setDomain(String domain) {
-        this.domain = domain;
-    }
-
-    public String getDefaultBucket() {
-        return defaultBucket;
-    }
-
-    public void setDefaultBucket(String defaultBucket) {
-        this.defaultBucket = defaultBucket;
-    }
 }

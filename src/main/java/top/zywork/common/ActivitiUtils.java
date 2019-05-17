@@ -1,5 +1,6 @@
 package top.zywork.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricProcessInstanceQuery;
 import org.activiti.engine.repository.Deployment;
@@ -11,8 +12,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.TaskQuery;
 import org.activiti.image.impl.DefaultProcessDiagramGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.constant.BPMNConstants;
 import top.zywork.vo.PagerVO;
 
@@ -33,10 +32,9 @@ import java.util.zip.ZipInputStream;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class ActivitiUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ActivitiUtils.class);
-
+    
     /**
      * 部署流程
      * @param repositoryService
@@ -46,27 +44,15 @@ public class ActivitiUtils {
      * @return
      */
     public static Deployment deployByPath(RepositoryService repositoryService, String processPath, String processName, String processKey) {
-        InputStream inputStream = null;
-        ZipInputStream zipInputStream = null;
-        try {
-            inputStream = new FileInputStream(processPath);
-            zipInputStream = new ZipInputStream(inputStream);
+        try (
+                InputStream inputStream = new FileInputStream(processPath);
+                ZipInputStream zipInputStream = new ZipInputStream(inputStream)
+        ) {
             return repositoryService.createDeployment().addZipInputStream(zipInputStream).name(processName).key(processKey).deploy();
         } catch (IOException e) {
-            logger.error("deploy process {} error: {}", processName, e.getMessage());
-            return null;
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (zipInputStream != null) {
-                    zipInputStream.close();
-                }
-            } catch (IOException e) {
-                logger.error("input stream close error: {}", e.getMessage());
-            }
+            log.error("deploy process {} error: {}", processName, e.getMessage());
         }
+        return null;
     }
 
     /**
@@ -89,17 +75,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 所有流程部署
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listDeployments(RepositoryService repositoryService, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-        long total = deploymentQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<Deployment>
-            pagerVO.setRows((List) deploymentQuery.orderByDeploymenTime().desc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return deploymentPagerVO(deploymentQuery, offset, limit);
     }
 
     /**
@@ -111,10 +89,21 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 指定流程的流程部署对象列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listDeployments(RepositoryService repositoryService, String processName, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery().deploymentNameLike(processName);
+        return deploymentPagerVO(deploymentQuery, offset, limit);
+    }
+
+    /**
+     * 流程部署查询
+     * @param deploymentQuery
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked"})
+    private static PagerVO deploymentPagerVO(DeploymentQuery deploymentQuery, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
         long total = deploymentQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);
@@ -177,17 +166,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 所有流程定义对象列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listProcessDefinitions(RepositoryService repositoryService, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery();
-        long total = processDefinitionQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<ProcessDefinition>
-            pagerVO.setRows((List) processDefinitionQuery.orderByProcessDefinitionVersion().desc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return processDefinitionPagerVO(processDefinitionQuery, offset, limit);
     }
 
     /**
@@ -199,10 +180,21 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 指定流程的流程定义对象列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listProcessDefinitions(RepositoryService repositoryService, String processName, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         ProcessDefinitionQuery processDefinitionQuery = repositoryService.createProcessDefinitionQuery().processDefinitionNameLike(processName);
+        return processDefinitionPagerVO(processDefinitionQuery, offset, limit);
+    }
+
+    /**
+     * 流程定义查询
+     * @param processDefinitionQuery
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked"})
+    private static PagerVO processDefinitionPagerVO(ProcessDefinitionQuery processDefinitionQuery, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
         long total = processDefinitionQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);
@@ -259,12 +251,7 @@ public class ActivitiUtils {
      * @return 流程实例
      */
     public static ProcessInstance startOneProcess(IdentityService identityService, RuntimeService runtimeService, String userIdentity, String processKey) {
-        long totalProcessInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(processKey).startedBy(userIdentity).count();
-        if (totalProcessInstance > 0) {
-            return null;
-        }
-        identityService.setAuthenticatedUserId(userIdentity);
-        return runtimeService.startProcessInstanceByKey(processKey);
+        return startOneProcess(identityService, runtimeService, userIdentity, processKey, null);
     }
 
     /**
@@ -283,7 +270,10 @@ public class ActivitiUtils {
             return null;
         }
         identityService.setAuthenticatedUserId(userIdentity);
-        return runtimeService.startProcessInstanceByKey(processKey, variables);
+        if (variables != null) {
+            return runtimeService.startProcessInstanceByKey(processKey, variables);
+        }
+        return runtimeService.startProcessInstanceByKey(processKey);
     }
 
     /**
@@ -346,17 +336,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 流程实例列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listProcessInstances(RuntimeService runtimeService, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery();
-        long total = processInstanceQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<ProcessInstance>
-            pagerVO.setRows((List) processInstanceQuery.listPage(offset, limit));
-        }
-        return pagerVO;
+        return processInstancePagerVO(processInstanceQuery, offset, limit);
     }
 
     /**
@@ -368,17 +350,10 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 流程实例列表
      */
-    @SuppressWarnings({"unchecked"})
+
     public static PagerVO listProcessInstances(RuntimeService runtimeService, String processKey, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey(processKey);
-        long total = processInstanceQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<ProcessInstance>
-            pagerVO.setRows((List) processInstanceQuery.listPage(offset, limit));
-        }
-        return pagerVO;
+       return processInstancePagerVO(processInstanceQuery, offset, limit);
     }
 
     /**
@@ -390,17 +365,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 流程实例列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listUserProcessInstances(RuntimeService runtimeService, String userIdentity, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().startedBy(userIdentity);
-        long total = processInstanceQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<ProcessInstance>
-            pagerVO.setRows((List) processInstanceQuery.listPage(offset, limit));
-        }
-        return pagerVO;
+        return processInstancePagerVO(processInstanceQuery, offset, limit);
     }
 
     /**
@@ -413,10 +380,21 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 流程实例列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listUserProcessInstances(RuntimeService runtimeService, String userIdentity, String processKey, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         ProcessInstanceQuery processInstanceQuery = runtimeService.createProcessInstanceQuery().processDefinitionKey(processKey).startedBy(userIdentity);
+        return processInstancePagerVO(processInstanceQuery, offset, limit);
+    }
+
+    /**
+     * 流程实例查询
+     * @param processInstanceQuery
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked"})
+    private static PagerVO processInstancePagerVO(ProcessInstanceQuery processInstanceQuery, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
         long total = processInstanceQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);
@@ -433,17 +411,9 @@ public class ActivitiUtils {
      * @param limit
      * @return
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listTasks(TaskService taskService, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         TaskQuery taskQuery = taskService.createTaskQuery();
-        long total = taskQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<Task>
-            pagerVO.setRows((List) taskQuery.orderByTaskCreateTime().asc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return taskPagerVO(taskQuery, offset, limit);
     }
 
     /**
@@ -455,17 +425,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 指定用户的所有任务组成的列表
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listAssigneeTasks(TaskService taskService, String userIdentity, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         TaskQuery taskQuery = taskService.createTaskQuery().taskAssignee(userIdentity);
-        long total = taskQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<Task>
-            pagerVO.setRows((List) taskQuery.orderByTaskCreateTime().asc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return taskPagerVO(taskQuery, offset, limit);
     }
 
     /**
@@ -477,17 +439,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 指定候选人的所有任务
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listCandidateUserTasks(TaskService taskService, String userIdentity, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateUser(userIdentity);
-        long total = taskQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<Task>
-            pagerVO.setRows((List) taskQuery.orderByTaskCreateTime().asc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return taskPagerVO(taskQuery, offset, limit);
     }
 
     /**
@@ -499,10 +453,21 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 指定候选角色或组的的所有任务
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listCandidateGroupTasks(TaskService taskService, List<String> roleIdentities, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         TaskQuery taskQuery = taskService.createTaskQuery().taskCandidateGroupIn(roleIdentities);
+        return taskPagerVO(taskQuery, offset, limit);
+    }
+
+    /**
+     * 任务查询
+     * @param taskQuery
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked"})
+    private static PagerVO taskPagerVO(TaskQuery taskQuery, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
         long total = taskQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);
@@ -593,17 +558,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 所有历史流程实例
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listHistoricProcessInstances(HistoryService historyService, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery();
-        long total = historicProcessInstanceQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<HistoricProcessInstance>
-            pagerVO.setRows((List) historicProcessInstanceQuery.orderByProcessInstanceEndTime().desc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return historicProcessInstancePagerVO(historicProcessInstanceQuery, offset, limit);
     }
 
     /**
@@ -615,17 +572,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 所有历史流程实例
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listHistoricProcessInstances(HistoryService historyService, String processKey, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processKey);
-        long total = historicProcessInstanceQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<HistoricProcessInstance>
-            pagerVO.setRows((List) historicProcessInstanceQuery.orderByProcessInstanceEndTime().desc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return historicProcessInstancePagerVO(historicProcessInstanceQuery, offset, limit);
     }
 
     /**
@@ -636,17 +585,9 @@ public class ActivitiUtils {
      * @param limit 个数
      * @return 所有历史流程实例
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listUserHistoricProcessInstances(HistoryService historyService, String userIdentity, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().startedBy(userIdentity);
-        long total = historicProcessInstanceQuery.count();
-        if (total > 0) {
-            pagerVO.setTotal(total);
-            // List<HistoricProcessInstance>
-            pagerVO.setRows((List) historicProcessInstanceQuery.orderByProcessInstanceEndTime().desc().listPage(offset, limit));
-        }
-        return pagerVO;
+        return historicProcessInstancePagerVO(historicProcessInstanceQuery, offset, limit);
     }
 
     /**
@@ -656,10 +597,21 @@ public class ActivitiUtils {
      * @param processKey    流程名
      * @return 所有历史流程实例
      */
-    @SuppressWarnings({"unchecked"})
     public static PagerVO listUserHistoricProcessInstances(HistoryService historyService, String processKey, String userIdentity, int offset, int limit) {
-        PagerVO pagerVO = new PagerVO(0L, null);
         HistoricProcessInstanceQuery historicProcessInstanceQuery = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(processKey).startedBy(userIdentity);
+        return historicProcessInstancePagerVO(historicProcessInstanceQuery, offset, limit);
+    }
+
+    /**
+     * 历史流程实例查询
+     * @param historicProcessInstanceQuery
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @SuppressWarnings({"unchecked"})
+    private static PagerVO historicProcessInstancePagerVO(HistoricProcessInstanceQuery historicProcessInstanceQuery, int offset, int limit) {
+        PagerVO pagerVO = new PagerVO(0L, null);
         long total = historicProcessInstanceQuery.count();
         if (total > 0) {
             pagerVO.setTotal(total);

@@ -1,5 +1,6 @@
 package top.zywork.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFPatriarch;
 import org.apache.poi.hssf.usermodel.HSSFPicture;
 import org.apache.poi.hssf.usermodel.HSSFShape;
@@ -9,8 +10,6 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.drawingml.x2006.spreadsheetDrawing.CTMarker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.enums.MIMETypeEnum;
 
 import java.io.*;
@@ -27,9 +26,8 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class ExcelUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
 
     private static final CellStyle NONE_CELL_STYLE = null;
     private static final Object NONE_CELL_VALUE = null;
@@ -61,7 +59,7 @@ public class ExcelUtils {
                 workbook = new XSSFWorkbook(inputStream);
             }
         } catch (IOException e) {
-            logger.error("read {} input stream error: {}", mimeTypeEnum.getValue(), e.getMessage());
+            log.error("read {} input stream error: {}", mimeTypeEnum.getValue(), e.getMessage());
         }
         return workbook;
     }
@@ -74,12 +72,10 @@ public class ExcelUtils {
      * @return Excel文档对应的Workbook对象
      */
     public Workbook readExcel(String path, MIMETypeEnum mimeTypeEnum) {
-        try {
-            InputStream inputStream = new FileInputStream(new File(path));
+        try (InputStream inputStream = new FileInputStream(new File(path))) {
             readExcel(inputStream, mimeTypeEnum);
-            inputStream.close();
         } catch (IOException e) {
-            logger.error("read file {} error: {}", path, e.getMessage());
+            log.error("read file {} error: {}", path, e.getMessage());
         }
         return workbook;
     }
@@ -147,20 +143,10 @@ public class ExcelUtils {
      * @param path     指定的文件路径
      */
     public static void writeExcel(Workbook workbook, String path) {
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(new File(path));
+        try (FileOutputStream outputStream = new FileOutputStream(new File(path))) {
             workbook.write(outputStream);
         } catch (IOException e) {
-            logger.error("write excel to file {} error: {}", path, e.getMessage());
-        } finally {
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    logger.error("output stream close error: {}", e.getMessage());
-                }
-            }
+            log.error("write excel to file {} error: {}", path, e.getMessage());
         }
     }
 
@@ -177,7 +163,7 @@ public class ExcelUtils {
         try {
             value = sheet.getRow(rowNo).getCell(columnNo).getBooleanCellValue();
         } catch (NullPointerException e) {
-            logger.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
         return value;
     }
@@ -195,7 +181,7 @@ public class ExcelUtils {
         try {
             value = sheet.getRow(rowNo).getCell(columnNo).getStringCellValue();
         } catch (NullPointerException e) {
-            logger.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
         return value;
     }
@@ -249,7 +235,7 @@ public class ExcelUtils {
         try {
             value = sheet.getRow(rowNo).getCell(columnNo).getNumericCellValue();
         } catch (NullPointerException e) {
-            logger.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
         return value;
     }
@@ -267,7 +253,7 @@ public class ExcelUtils {
         try {
             value = sheet.getRow(rowNo).getCell(columnNo).getDateCellValue();
         } catch (NullPointerException e) {
-            logger.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("null value in cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
         return value;
     }
@@ -284,7 +270,7 @@ public class ExcelUtils {
         try {
             sheet.getRow(rowNo).getCell(columnNo).setCellValue(value);
         } catch (NullPointerException e) {
-            logger.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
     }
 
@@ -300,7 +286,7 @@ public class ExcelUtils {
         try {
             sheet.getRow(rowNo).getCell(columnNo).setCellValue(value);
         } catch (NullPointerException e) {
-            logger.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
     }
 
@@ -316,7 +302,7 @@ public class ExcelUtils {
         try {
             sheet.getRow(rowNo).getCell(columnNo).setCellValue(value);
         } catch (NullPointerException e) {
-            logger.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
     }
 
@@ -332,7 +318,7 @@ public class ExcelUtils {
         try {
             sheet.getRow(rowNo).getCell(columnNo).setCellValue(value);
         } catch (NullPointerException e) {
-            logger.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
     }
 
@@ -348,7 +334,7 @@ public class ExcelUtils {
         try {
             sheet.getRow(rowNo).getCell(columnNo).setCellValue(value);
         } catch (NullPointerException e) {
-            logger.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
+            log.error("not exist cell [{},{}] in sheet {}", rowNo, columnNo, sheet.getSheetName());
         }
     }
 
@@ -544,17 +530,8 @@ public class ExcelUtils {
                               int leftDX, int topDY, int widthDX, int heightDY,
                               int beginRow, int beginCol, int endRow, int endCol) {
         Drawing drawing = sheet.createDrawingPatriarch();
-        ClientAnchor clientAnchor = workbook.getCreationHelper().createClientAnchor();
-        clientAnchor.setDx1(leftDX);
-        clientAnchor.setDy1(topDY);
-        clientAnchor.setDx2(widthDX);
-        clientAnchor.setDy2(heightDY);
-        clientAnchor.setRow1(beginRow);
-        clientAnchor.setCol1(beginCol);
-        clientAnchor.setRow2(endRow);
-        clientAnchor.setCol2(endCol);
-        drawing.createPicture(clientAnchor,
-                workbook.addPicture(ImageUtils.getImageData(imagePath), getImageType(imagePath)));
+        ClientAnchor clientAnchor = getClientAnchor(leftDX, topDY, widthDX, heightDY, beginRow, beginCol, endRow, endCol);
+        drawing.createPicture(clientAnchor, workbook.addPicture(ImageUtils.getImageData(imagePath), getImageType(imagePath)));
     }
 
     /**
@@ -576,6 +553,24 @@ public class ExcelUtils {
                               int leftDX, int topDY, int widthDX, int heightDY,
                               int beginRow, int beginCol, int endRow, int endCol) {
         Drawing drawing = sheet.createDrawingPatriarch();
+        ClientAnchor clientAnchor = getClientAnchor(leftDX, topDY, widthDX, heightDY, beginRow, beginCol, endRow, endCol);
+        drawing.createPicture(clientAnchor, workbook.addPicture(ImageUtils.getImageData(imageInputStream, imageType), getImageType(imageType)));
+    }
+
+    /**
+     * 创建图片ClientAnchor对象
+     * @param leftDX    图片离单元格左上角的x距离
+     * @param topDY     图片离单元格左上角的y距离
+     * @param widthDX   图片的宽度
+     * @param heightDY  图片的高度
+     * @param beginRow  图片开始的行
+     * @param beginCol  图片开始的列
+     * @param endRow    图片结束的行
+     * @param endCol    图片结束的列
+     * @return
+     */
+    private ClientAnchor getClientAnchor( int leftDX, int topDY, int widthDX, int heightDY,
+                                          int beginRow, int beginCol, int endRow, int endCol) {
         ClientAnchor clientAnchor = workbook.getCreationHelper().createClientAnchor();
         clientAnchor.setDx1(leftDX);
         clientAnchor.setDy1(topDY);
@@ -585,8 +580,7 @@ public class ExcelUtils {
         clientAnchor.setCol1(beginCol);
         clientAnchor.setRow2(endRow);
         clientAnchor.setCol2(endCol);
-        drawing.createPicture(clientAnchor,
-                workbook.addPicture(ImageUtils.getImageData(imageInputStream, imageType), getImageType(imageType)));
+        return clientAnchor;
     }
 
     /**
@@ -597,14 +591,12 @@ public class ExcelUtils {
      * @param beginRow  图片开始的行
      * @param beginCol  图片开始的列
      */
-    public void insertPicture(Sheet sheet, String imagePath,
-                              int beginRow, int beginCol) {
+    public void insertPicture(Sheet sheet, String imagePath, int beginRow, int beginCol) {
         Drawing drawing = sheet.createDrawingPatriarch();
         ClientAnchor clientAnchor = workbook.getCreationHelper().createClientAnchor();
         clientAnchor.setRow1(beginRow);
         clientAnchor.setCol1(beginCol);
-        Picture picture = drawing.createPicture(clientAnchor,
-                workbook.addPicture(ImageUtils.getImageData(imagePath), getImageType(imagePath)));
+        Picture picture = drawing.createPicture(clientAnchor, workbook.addPicture(ImageUtils.getImageData(imagePath), getImageType(imagePath)));
         picture.resize();
     }
 
@@ -617,14 +609,12 @@ public class ExcelUtils {
      * @param beginRow         图片开始的行
      * @param beginCol         图片开始的列
      */
-    public void insertPicture(Sheet sheet, InputStream imageInputStream, MIMETypeEnum imageType,
-                              int beginRow, int beginCol) {
+    public void insertPicture(Sheet sheet, InputStream imageInputStream, MIMETypeEnum imageType, int beginRow, int beginCol) {
         Drawing drawing = sheet.createDrawingPatriarch();
         ClientAnchor clientAnchor = workbook.getCreationHelper().createClientAnchor();
         clientAnchor.setRow1(beginRow);
         clientAnchor.setCol1(beginCol);
-        Picture picture = drawing.createPicture(clientAnchor,
-                workbook.addPicture(ImageUtils.getImageData(imageInputStream, imageType), getImageType(imageType)));
+        Picture picture = drawing.createPicture(clientAnchor, workbook.addPicture(ImageUtils.getImageData(imageInputStream, imageType), getImageType(imageType)));
         picture.resize();
     }
 
@@ -777,7 +767,7 @@ public class ExcelUtils {
             try {
                 workbook.close();
             } catch (IOException e) {
-                logger.error("workbook close error: {}", e.getMessage());
+                log.error("workbook close error: {}", e.getMessage());
             }
         }
     }

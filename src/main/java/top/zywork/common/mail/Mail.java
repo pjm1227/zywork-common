@@ -1,7 +1,10 @@
 package top.zywork.common.mail;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -22,83 +25,45 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Slf4j
 public class Mail {
 
-	private static final Logger logger = LoggerFactory.getLogger(Mail.class);
-	
+	/**
+	 * 邮件发送者
+	 */
 	private MailAccount from;
+	/**
+	 * 邮件接收者
+	 */
 	private List<MailAccount> recipients;
+	/**
+	 * 抄送人
+	 */
 	private List<MailAccount> ccRecipients;
+	/**
+	 * 密送人
+	 */
 	private List<MailAccount> bccRecipients;
+	/**
+	 * 邮件主题
+	 */
 	private String subject;
+	/**
+	 * 邮件内容
+	 */
 	private String content;
+	/**
+	 * 内容类型
+	 */
 	private String contentType;
+	/**
+	 * 邮件附件
+	 */
 	private List<String> files;
-	private Multipart multipart;
-
-	public MailAccount getFrom() {
-		return from;
-	}
-
-	public void setFrom(MailAccount from) {
-		this.from = from;
-	}
-
-	public List<MailAccount> getRecipients() {
-		return recipients;
-	}
-
-	public void setRecipients(List<MailAccount> recipients) {
-		this.recipients = recipients;
-	}
-
-	public List<MailAccount> getCcRecipients() {
-		return ccRecipients;
-	}
-
-	public void setCcRecipients(List<MailAccount> ccRecipients) {
-		this.ccRecipients = ccRecipients;
-	}
-
-	public List<MailAccount> getBccRecipients() {
-		return bccRecipients;
-	}
-
-	public void setBccRecipients(List<MailAccount> bccRecipients) {
-		this.bccRecipients = bccRecipients;
-	}
-
-	public String getSubject() {
-		return subject;
-	}
-
-	public void setSubject(String subject) {
-		this.subject = subject;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public List<String> getFiles() {
-		return files;
-	}
-
-	public void setFiles(List<String> files) {
-		this.files = files;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
 
 	public Multipart getMultipart() {
 		Multipart multipart = new MimeMultipart();
@@ -114,7 +79,7 @@ public class Mail {
 				multipart.addBodyPart(attachmentPart);
 			}
 		} catch (MessagingException | UnsupportedEncodingException e) {
-			logger.error("get multipart error: {}", e.getMessage());
+			log.error("get multipart error: {}", e.getMessage());
 		}
 		return multipart;
 	}

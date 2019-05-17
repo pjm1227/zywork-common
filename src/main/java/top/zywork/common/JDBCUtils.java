@@ -1,7 +1,5 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.enums.DatePatternEnum;
 
 import java.math.BigDecimal;
@@ -15,8 +13,6 @@ import java.math.BigDecimal;
  * @version 1.0
  */
 public class JDBCUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(JDBCUtils.class);
 
     /**
      * 获取字段对应的Java类型的名称

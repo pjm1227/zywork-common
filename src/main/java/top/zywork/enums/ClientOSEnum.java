@@ -29,4 +29,5 @@ public enum ClientOSEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

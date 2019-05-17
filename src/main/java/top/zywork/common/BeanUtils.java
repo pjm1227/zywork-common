@@ -1,7 +1,6 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,9 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class BeanUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(BeanUtils.class);
-
+    
     /**
      * 把源对象拷贝到目标对象
      * @param source 源对象
@@ -44,7 +42,7 @@ public class BeanUtils {
             org.springframework.beans.BeanUtils.copyProperties(source, t);
             return t;
         } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Bean copy error, src: {}, target: {}, error: {}", source.getClass(), targetClass, e.getMessage());
+            log.error("Bean copy error, src: {}, target: {}, error: {}", source.getClass(), targetClass, e.getMessage());
             return null;
         }
     }

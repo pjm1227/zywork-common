@@ -11,4 +11,9 @@ import java.io.Serializable;
  */
 public class BaseDO implements Serializable {
     private static final long serialVersionUID = -1990701184136933177L;
+
+    @Override
+    public String toString() {
+        return "BaseDO{}";
+    }
 }

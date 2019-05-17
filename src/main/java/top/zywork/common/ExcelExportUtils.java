@@ -1,11 +1,10 @@
 package top.zywork.common;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.dto.ExcelExportDTO;
 import top.zywork.enums.MIMETypeEnum;
 
@@ -20,9 +19,9 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class ExcelExportUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExcelExportUtils.class);
+    
     /**
      * 通过ExcelExportDTO导出数据到excel的Workbook中
      * @param excelExportDTO 由读取JSON配置文件生成的ExcelExportDTO实例
@@ -97,7 +96,7 @@ public class ExcelExportUtils {
         try {
             return JSON.parseObject(jsonInput, ExcelExportDTO.class);
         } catch (IOException e) {
-            logger.error("build export dto from input stream error: {}", e.getMessage());
+            log.error("build export dto from input stream error: {}", e.getMessage());
         }
         return null;
     }

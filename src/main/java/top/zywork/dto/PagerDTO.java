@@ -1,5 +1,10 @@
 package top.zywork.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
@@ -9,39 +14,13 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PagerDTO {
 
     private Long total;
     private List<Object> rows;
 
-    public PagerDTO() {}
-
-    public PagerDTO(Long total, List<Object> rows) {
-        this.total = total;
-        this.rows = rows;
-    }
-
-    public Long getTotal() {
-        return total;
-    }
-
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public List<Object> getRows() {
-        return rows;
-    }
-
-    public void setRows(List<Object> rows) {
-        this.rows = rows;
-    }
-
-    @Override
-    public String toString() {
-        return "PagerDTO{" +
-                "total=" + total +
-                ", rows=" + rows +
-                '}';
-    }
 }

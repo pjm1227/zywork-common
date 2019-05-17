@@ -1,7 +1,6 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import top.zywork.enums.MIMETypeEnum;
 
 import javax.imageio.ImageIO;
@@ -20,9 +19,8 @@ import java.util.Iterator;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class ImageUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ImageUtils.class);
 
     /**
      * 根据指定的图片路径，获取缓冲图片
@@ -30,20 +28,10 @@ public class ImageUtils {
      * @return 缓冲图对象，如果出现异常则返回null
      */
     public static BufferedImage getBufferedImage(String imagePath) {
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(new File(imagePath));
+        try (InputStream inputStream = new FileInputStream(new File(imagePath))) {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
-            logger.error("read image input stream error: {}, path: {}", e.getMessage(), imagePath);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.error("input stream close error: {}", e.getMessage());
-                }
-            }
+            log.error("read image input stream error: {}, path: {}", e.getMessage(), imagePath);
         }
         return null;
     }
@@ -57,7 +45,7 @@ public class ImageUtils {
         try {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
-            logger.error("read image from input stream error: {}", e.getMessage());
+            log.error("read image from input stream error: {}", e.getMessage());
         }
         return null;
     }
@@ -68,17 +56,10 @@ public class ImageUtils {
      * @return 缓冲图对象
      */
     public static BufferedImage getBufferedImage(byte[] imageData) {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
-        try {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData)) {
             return ImageIO.read(inputStream);
         } catch (IOException e) {
-            logger.error("read image from byte array input stream error: {}", e.getMessage());
-        } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                logger.error("byte array input stream close error: {}", e.getMessage());
-            }
+            log.error("read image from byte array input stream error: {}", e.getMessage());
         }
         return null;
     }
@@ -94,7 +75,7 @@ public class ImageUtils {
             try {
                 ImageIO.write(bufferedImage, FileUtils.getExt(imagePath), out);
             } catch (IOException e) {
-                logger.error("write image with file path {} to output stream error: {}", imagePath, e.getMessage());
+                log.error("write image with file path {} to output stream error: {}", imagePath, e.getMessage());
             }
         }
     }
@@ -111,7 +92,7 @@ public class ImageUtils {
             try {
                 ImageIO.write(bufferedImage, imageType.getValue(), out);
             } catch (IOException e) {
-                logger.error("write image with type {} to output stream error: {}", imageType.getExt(), e.getMessage());
+                log.error("write image with type {} to output stream error: {}", imageType.getExt(), e.getMessage());
             }
         }
     }
@@ -122,15 +103,13 @@ public class ImageUtils {
      * @return 图片对应的字节数组数据
      */
     public static byte[] getImageData(String imagePath) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeToOut(imagePath, out);
-        byte[] bytes = out.toByteArray();
-        try {
-            out.close();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            writeToOut(imagePath, outputStream);
+            return outputStream.toByteArray();
         } catch (IOException e) {
-            logger.error("byte array output stream close error: {}", e.getMessage());
+            log.error("byte array output stream error: {}", e.getMessage());
         }
-        return bytes;
+        return null;
     }
 
     /**
@@ -140,15 +119,13 @@ public class ImageUtils {
      * @return 图片对应的字节数组数据
      */
     public static byte[] getImageData(InputStream inputStream, MIMETypeEnum imageType) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeToOut(inputStream, out, imageType);
-        byte[] bytes = out.toByteArray();
-        try {
-            out.close();
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            writeToOut(inputStream, outputStream, imageType);
+            return outputStream.toByteArray();
         } catch (IOException e) {
-            logger.error("byte array output stream close error: {}", e.getMessage());
+            log.error("byte array output stream error: {}", e.getMessage());
         }
-        return bytes;
+        return null;
     }
 
     /**
@@ -194,7 +171,7 @@ public class ImageUtils {
             try {
                 ImageIO.write(bufferedImage, imageType, imageFile);
             } catch (IOException e) {
-                logger.error("save image to path {} with type {} error: {}", imagePath, imageType, e.getMessage());
+                log.error("save image to path {} with type {} error: {}", imagePath, imageType, e.getMessage());
             }
         }
     }
@@ -210,7 +187,7 @@ public class ImageUtils {
         try {
             ImageIO.write(bufferedImage, imageType.getValue(), imageFile);
         } catch (IOException e) {
-            logger.error("save image to path {} with type {} error: {}", imagePath, imageType.getValue(), e.getMessage());
+            log.error("save image to path {} with type {} error: {}", imagePath, imageType.getValue(), e.getMessage());
         }
     }
 
@@ -225,7 +202,7 @@ public class ImageUtils {
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             return urlConnection.getInputStream();
         } catch (IOException e) {
-            logger.error("get image input stream from url error: {}", e.getMessage());
+            log.error("get image input stream from url error: {}", e.getMessage());
         }
         return null;
     }
@@ -239,7 +216,7 @@ public class ImageUtils {
         try {
             return ImageIO.read(new URL(urlString));
         } catch (IOException e) {
-            logger.error("get buffered image from url error: {}", e.getMessage());
+            log.error("get buffered image from url error: {}", e.getMessage());
         }
         return null;
     }
@@ -250,15 +227,14 @@ public class ImageUtils {
      * @return
      */
     public static String getImageFormat(InputStream inputStream) {
-        try {
-            ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream);
+        try (ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream)) {
             Iterator<ImageReader> iterator = ImageIO.getImageReaders(imageInputStream);
             while (iterator.hasNext()) {
                 ImageReader reader = iterator.next();
                 return reader.getFormatName();
             }
         } catch (IOException e) {
-            logger.error("get image format from input stream error: {}", e.getMessage());
+            log.error("get image format from input stream error: {}", e.getMessage());
         }
         return null;
     }

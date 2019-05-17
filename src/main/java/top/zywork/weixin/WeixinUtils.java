@@ -4,9 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import top.zywork.common.HttpUtils;
 import top.zywork.common.IOUtils;
 import top.zywork.common.UUIDUtils;
@@ -40,13 +39,13 @@ import java.util.Map;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class WeixinUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(WeixinUtils.class);
 
     public static final String EXTRA_PARAMS = "extraParams";
 
-    public static final String EXTRA_PARAMS_SEPERATOR = "__";
+    public static final String EXTRA_PARAMS_SEPARATOR = "__";
 
     /**
      * 从哪个url进入到公众号授权界面
@@ -156,7 +155,7 @@ public class WeixinUtils {
         try {
             data.put("sign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
         } catch (Exception e) {
-            logger.error("unifiedOrderData error: {}", e.getMessage());
+            log.error("unifiedOrderData error: {}", e.getMessage());
         }
         return data;
     }
@@ -183,7 +182,7 @@ public class WeixinUtils {
                 return WXPayUtil.xmlToMap(unifiedOrderResult);
             }
         } catch (Exception e) {
-            logger.error("unifiedOrder error: {}", e.getMessage());
+            log.error("unifiedOrder error: {}", e.getMessage());
         }
         return null;
     }
@@ -205,7 +204,7 @@ public class WeixinUtils {
         try {
             data.put("paySign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
         } catch (Exception e) {
-            logger.error("payDataMap error: {}", e.getMessage());
+            log.error("payDataMap error: {}", e.getMessage());
         }
         return data;
     }
@@ -241,7 +240,7 @@ public class WeixinUtils {
             }
             return WXPayUtil.xmlToMap(result.toString());
         } catch (Exception e) {
-            logger.error("payResult error: {}", e.getMessage());
+            log.error("payResult error: {}", e.getMessage());
         }
         return null;
     }
@@ -274,7 +273,7 @@ public class WeixinUtils {
         try {
             response.getWriter().write(PayConstants.PAY_NOTIFY_RESULT);
         } catch (IOException e) {
-            logger.error("responsePayNotify error: {}", e.getMessage());
+            log.error("responsePayNotify error: {}", e.getMessage());
         }
     }
 
@@ -316,7 +315,7 @@ public class WeixinUtils {
         try {
             data.put("sign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
         } catch (Exception e) {
-            logger.error("redpackData error: {}", e.getMessage());
+            log.error("redpackData error: {}", e.getMessage());
         }
         return data;
     }
@@ -348,7 +347,7 @@ public class WeixinUtils {
                 return WXPayUtil.xmlToMap(redpackResult);
             }
         } catch (Exception e) {
-            logger.error("sendRedpack error: {}", e.getMessage());
+            log.error("sendRedpack error: {}", e.getMessage());
         }
         return null;
     }
@@ -423,7 +422,7 @@ public class WeixinUtils {
             String dataStr = new String(cipher.doFinal(decoder.decode(encryptedData)),CharsetEnum.UTF8.getValue());
             return IOUtils.readJsonStrToObject(dataStr, XcxPhone.class);
         } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
-            logger.error("decryptData error: {}", e.getMessage());
+            log.error("decryptData error: {}", e.getMessage());
         }
         return null;
     }

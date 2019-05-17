@@ -52,4 +52,5 @@ public enum AliyunRegionEnum {
     public void setLocalName(String localName) {
         this.localName = localName;
     }
+
 }

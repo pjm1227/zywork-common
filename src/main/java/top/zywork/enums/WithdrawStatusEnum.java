@@ -57,4 +57,5 @@ public enum WithdrawStatusEnum {
     public static WithdrawStatusEnum findByValue(Integer value) {
         return lookup.get(value);
     }
+
 }

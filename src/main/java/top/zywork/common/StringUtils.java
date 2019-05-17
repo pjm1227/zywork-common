@@ -24,10 +24,10 @@ public class StringUtils {
      */
     public static String strToAscii(String str, String separator, RadixEnum radixEnum) {
         char[] chars = str.toCharArray();
-        StringBuilder ascii = new StringBuilder("");
+        StringBuilder ascii = new StringBuilder();
         for (char c : chars) {
             ascii.append(separator);
-            String cAscii = "";
+            String cAscii;
             if (radixEnum == RadixEnum.BINARY) {
                 cAscii = Integer.toBinaryString(c);
             } else if (radixEnum == RadixEnum.OCTAL) {
@@ -51,9 +51,9 @@ public class StringUtils {
      */
     public static String asciiToStr(String ascii, String separator, RadixEnum radixEnum) {
         String[] chars = ascii.split(separator);
-        StringBuilder str = new StringBuilder("");
+        StringBuilder str = new StringBuilder();
         for (String c : chars) {
-            if (!c.equals("")) {
+            if (!"".equals(c)) {
                 str.append((char) Integer.parseInt(c, radixEnum.getValue()));
             }
         }
@@ -88,9 +88,17 @@ public class StringUtils {
      * @return 整型数字数组
      */
     public static Integer[] strToIntegerArray(String str, String separator) {
-        String[] strArray = str.split(separator);
+        return strArrayToIntegerArray(str.split(separator));
+    }
+
+    /**
+     * 把字符器中数组转化成对应的整型数组
+     * @param strArray 字符串数组
+     * @return 长整型数组
+     */
+    public static Integer[] strArrayToIntegerArray(String[] strArray) {
         Integer[] integerArray = new Integer[strArray.length];
-        for (int i = 0, len = strArray.length; i < len; i++) {
+        for (int i = 0, len = integerArray.length; i < len; i++) {
             integerArray[i] = Integer.valueOf(strArray[i]);
         }
         return integerArray;
@@ -115,7 +123,10 @@ public class StringUtils {
      */
     public static boolean isInArray(String[] strArray, String str, boolean ignoreCase) {
         for (String s : strArray) {
-            if ((ignoreCase && s.equalsIgnoreCase(str)) || (!ignoreCase && s.equals(str))) {
+            if (ignoreCase && s.equalsIgnoreCase(str)) {
+                return true;
+            }
+            if (!ignoreCase && s.equals(str)) {
                 return true;
             }
         }
@@ -142,7 +153,7 @@ public class StringUtils {
      * @return 字符串
      */
     public static String charListToString(List<Character> characters) {
-        StringBuilder sb = new StringBuilder("");
+        StringBuilder sb = new StringBuilder();
         for (Character c : characters) {
             sb.append(c);
         }

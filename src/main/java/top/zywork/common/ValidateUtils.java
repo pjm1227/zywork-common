@@ -18,7 +18,9 @@ public class ValidateUtils {
 
     private static Validator validator;
 
-    // 静态代码块初始化Validator，并且使用单例模式
+    /**
+     * 静态代码块初始化Validator，并且使用单例模式
+     */
     static {
         synchronized (Object.class) {
             if (validator == null) {
@@ -73,7 +75,7 @@ public class ValidateUtils {
      * @return 如果有错误消息，则组装成String字符中返回，否则返回null
      */
     private static <T> String validateMessage(Set<ConstraintViolation<T>> constraintViolationSet) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder();
         if (constraintViolationSet.size() > 0) {
             for (ConstraintViolation<T> cv : constraintViolationSet) {
                 stringBuilder.append(cv.getMessage()).append("\n");

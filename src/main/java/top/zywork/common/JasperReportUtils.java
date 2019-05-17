@@ -1,12 +1,11 @@
 package top.zywork.common;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrintManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -18,10 +17,9 @@ import java.util.Map;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class JasperReportUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(JasperReportUtils.class);
-
+    
     /**
      * 根据指定的参数和Bean Collection数据源导出PDF文件
      * @param jasperFile jasper文件路径
@@ -42,7 +40,7 @@ public class JasperReportUtils {
                 pdfFile = JasperExportManager.exportReportToPdfFile(jasperPrintFile);
             }
         } catch (JRException e) {
-            logger.error("export pdf error: {}", e.getMessage());
+            log.error("export pdf error: {}", e.getMessage());
         }
         return pdfFile;
     }
@@ -67,7 +65,7 @@ public class JasperReportUtils {
                 htmlFile = JasperExportManager.exportReportToHtmlFile(jasperPrintFile);
             }
         } catch (JRException e) {
-            logger.error("export pdf error: {}", e.getMessage());
+            log.error("export pdf error: {}", e.getMessage());
         }
         return htmlFile;
     }
@@ -83,7 +81,7 @@ public class JasperReportUtils {
         try {
             JasperPrintManager.printReport(getJasperPrintFile(jasperFile, params, dataSource), true);
         } catch (JRException e) {
-            logger.error("print pdf error: {}", e.getMessage());
+            log.error("print pdf error: {}", e.getMessage());
         }
     }
 

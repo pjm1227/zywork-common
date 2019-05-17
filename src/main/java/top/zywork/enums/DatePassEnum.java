@@ -8,6 +8,7 @@ package top.zywork.enums;
  * @version 1.0
  */
 public enum DatePassEnum {
+
     SECONDS_PASS("秒前"),
     MINUTES_PASS("分钟前"),
     HOURS_PASS("小时前"),
@@ -27,4 +28,5 @@ public enum DatePassEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

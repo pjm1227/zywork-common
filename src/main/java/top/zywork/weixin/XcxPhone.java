@@ -1,5 +1,10 @@
 package top.zywork.weixin;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 存储微信小程序获取的手机号信息<br/>
  *
@@ -8,33 +13,13 @@ package top.zywork.weixin;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class XcxPhone {
 
     private String phoneNumber;
     private String purePhoneNumber;
     private String countryCode;
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getPurePhoneNumber() {
-        return purePhoneNumber;
-    }
-
-    public void setPurePhoneNumber(String purePhoneNumber) {
-        this.purePhoneNumber = purePhoneNumber;
-    }
-
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-    public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
-    }
 }

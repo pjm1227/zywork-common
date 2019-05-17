@@ -21,6 +21,8 @@ import java.util.List;
  */
 public abstract class AbstractBaseService implements BaseService {
 
+    private static final String PROPERTY_VERSION = "version";
+
     private BaseDAO baseDAO;
     private Class<?> doClass;
     private Class<?> dtoClass;
@@ -51,7 +53,7 @@ public abstract class AbstractBaseService implements BaseService {
         Serializable id = idObj instanceof Long ? (Long) idObj : idObj instanceof Integer ? (Integer) idObj : idObj instanceof String ? (String) idObj : 0;
         Integer version = baseDAO.getVersionById(id);
         version = version == null ? 1 : version;
-        ReflectUtils.setPropertyValue(dataTransferObj, "version", version + 1);
+        ReflectUtils.setPropertyValue(dataTransferObj, PROPERTY_VERSION, version + 1);
         return baseDAO.update(BeanUtils.copy(dataTransferObj, doClass));
     }
 
@@ -76,35 +78,27 @@ public abstract class AbstractBaseService implements BaseService {
 
     @Override
     public PagerDTO listById(Serializable id) {
-        PagerDTO pagerDTO = new PagerDTO();
-        List<Object> doObjList = baseDAO.listById(id);
-        List<Object> dtoObjList = new ArrayList<>();
-        if (doObjList != null && doObjList.size() > 0) {
-            dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
-        }
-        pagerDTO.setRows(dtoObjList);
-        pagerDTO.setTotal((long) dtoObjList.size());
-        return pagerDTO;
+       return buildPagerDTO(baseDAO.listById(id));
     }
 
     @Override
     public PagerDTO listAll() {
-        PagerDTO pagerDTO = new PagerDTO();
-        List<Object> doObjList = baseDAO.listAll();
-        List<Object> dtoObjList = new ArrayList<>();
-        if (doObjList != null && doObjList.size() > 0) {
-            dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
-        }
-        pagerDTO.setRows(dtoObjList);
-        pagerDTO.setTotal((long) dtoObjList.size());
-        return pagerDTO;
+        return buildPagerDTO(baseDAO.listAll());
     }
 
     @Override
     public PagerDTO listAllByCondition(Object queryObj) {
+        return buildPagerDTO( baseDAO.listAllByCondition(queryObj));
+    }
+
+    /**
+     * 把DO对象集合放到PagerDTO中，适用于listById, listAll, listAllByCondition
+     * @param doObjList
+     * @return
+     */
+    private PagerDTO buildPagerDTO(List<Object> doObjList) {
         PagerDTO pagerDTO = new PagerDTO();
         List<Object> dtoObjList = new ArrayList<>();
-        List<Object> doObjList = baseDAO.listAllByCondition(queryObj);
         if (doObjList != null && doObjList.size() > 0) {
             dtoObjList = BeanUtils.copyList(doObjList, dtoClass);
         }

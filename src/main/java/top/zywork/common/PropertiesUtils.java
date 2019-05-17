@@ -1,7 +1,6 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.Properties;
@@ -13,13 +12,12 @@ import java.util.Properties;
  * @author WangZhenyu
  * @version 1.0
  */
-public class ConfigUtils {
+@Slf4j
+public class PropertiesUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
+    private Properties properties;
 
-    protected Properties properties;
-
-    public ConfigUtils() {}
+    public PropertiesUtils() {}
 
     /**
      * 根据指定的配置文件路径读取文件内容到Properties实例中
@@ -27,25 +25,17 @@ public class ConfigUtils {
      * @return Properties对象
      * @see FileUtils
      */
-    public Properties build(String location) {
+    public Properties read(String location) {
         properties = new Properties();
-        BufferedReader bufferedReader = null;
-        try {
-            bufferedReader = new BufferedReader(
-                    new InputStreamReader(
-                            new BufferedInputStream(
-                                    new FileInputStream(FileUtils.getResourcePath(location)))));
+        try (
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(
+                                new BufferedInputStream(
+                                        new FileInputStream(FileUtils.getResourcePath(location)))))
+        ) {
             properties.load(bufferedReader);
         } catch (IOException e) {
-            logger.error("read config file from {} error: {}", location, e.getMessage());
-        } finally {
-            if (bufferedReader !=  null) {
-                try {
-                    bufferedReader.close();
-                } catch (IOException e) {
-                    logger.error("close buffered reader error: {}", e.getMessage());
-                }
-            }
+            log.error("read config file from {} error: {}", location, e.getMessage());
         }
         return properties;
     }
@@ -55,8 +45,9 @@ public class ConfigUtils {
      * @param key properties文件中的key
      * @return 返回key值对应的整数值，当且仅当此值是一个整数类型值时
      */
-    public int getInt(String key) {
-        return Integer.valueOf(properties.getProperty(key));
+    public Integer getInteger(String key) {
+        String value = properties.getProperty(key);
+        return value == null ? null : Integer.valueOf(value);
     }
 
     /**
@@ -73,8 +64,9 @@ public class ConfigUtils {
      * @param key properties文件中的key
      * @return 返回key值对应的double值，当且仅当此值是一个数值类型值时
      */
-    public double getDouble(String key) {
-        return Double.valueOf(properties.getProperty(key));
+    public Double getDouble(String key) {
+        String value = properties.getProperty(key);
+        return value == null ? null : Double.valueOf(value);
     }
 
     /**
@@ -82,8 +74,14 @@ public class ConfigUtils {
      * @param key properties文件中的key
      * @return 返回key值对应的长整型值，当且仅当此值是一个整数类型值时
      */
-    public long getLong(String key) {
-        return Long.valueOf(properties.getProperty(key));
+    public Long getLong(String key) {
+        String value = properties.getProperty(key);
+        return value == null ? null : Long.valueOf(value);
+    }
+
+    public Boolean getBoolean(String key) {
+        String value = properties.getProperty(key);
+        return value == null ? null : Boolean.valueOf(value);
     }
 
 }

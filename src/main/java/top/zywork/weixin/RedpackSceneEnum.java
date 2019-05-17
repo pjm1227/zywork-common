@@ -42,4 +42,5 @@ public enum RedpackSceneEnum {
     public void setDes(String des) {
         this.des = des;
     }
+
 }

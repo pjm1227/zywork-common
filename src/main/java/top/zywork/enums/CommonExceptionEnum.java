@@ -10,6 +10,7 @@ package top.zywork.enums;
  * @version 1.0
  */
 public enum CommonExceptionEnum {
+
     APP_EXCEPTION(1, "应用异常"),
     DAO_EXCEPTION(2, "数据访问异常"),
     SERVICE_EXCEPTION(3, "服务异常");
@@ -37,4 +38,5 @@ public enum CommonExceptionEnum {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

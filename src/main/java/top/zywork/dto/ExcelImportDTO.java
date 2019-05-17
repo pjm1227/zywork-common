@@ -1,5 +1,10 @@
 package top.zywork.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 用于封装Excel导入的基本信息，此基本信息由json配置文件指定。<br/>
  * rows属性为需要导入的数据<br/>
@@ -8,6 +13,10 @@ package top.zywork.dto;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ExcelImportDTO extends BaseDTO{
 
     private static final long serialVersionUID = 7358466249603435234L;
@@ -17,35 +26,4 @@ public class ExcelImportDTO extends BaseDTO{
     private String[] properties;
     private String destinationClass;
 
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public Integer getBeginRow() {
-        return beginRow;
-    }
-
-    public void setBeginRow(Integer beginRow) {
-        this.beginRow = beginRow;
-    }
-
-    public String[] getProperties() {
-        return properties;
-    }
-
-    public void setProperties(String[] properties) {
-        this.properties = properties;
-    }
-
-    public String getDestinationClass() {
-        return destinationClass;
-    }
-
-    public void setDestinationClass(String destinationClass) {
-        this.destinationClass = destinationClass;
-    }
 }

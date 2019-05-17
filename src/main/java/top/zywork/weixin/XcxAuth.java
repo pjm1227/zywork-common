@@ -1,5 +1,10 @@
 package top.zywork.weixin;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 存储微信小程序授权获取的session_key与openid的对象<br/>
  *
@@ -8,40 +13,14 @@ package top.zywork.weixin;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class XcxAuth {
 
     private String sessionKey;
     private String openid;
     private String unionid;
 
-    public XcxAuth() {}
-
-    public XcxAuth(String sessionKey, String openid) {
-        this.sessionKey = sessionKey;
-        this.openid = openid;
-    }
-
-    public String getSessionKey() {
-        return sessionKey;
-    }
-
-    public void setSessionKey(String sessionKey) {
-        this.sessionKey = sessionKey;
-    }
-
-    public String getOpenid() {
-        return openid;
-    }
-
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
-
-    public String getUnionid() {
-        return unionid;
-    }
-
-    public void setUnionid(String unionid) {
-        this.unionid = unionid;
-    }
 }

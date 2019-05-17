@@ -1,7 +1,6 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -23,9 +22,8 @@ import java.io.PrintWriter;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class WebUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(WebUtils.class);
 
     public static final String SESSION_ID_NAME = "JSESSIONID";
 
@@ -85,7 +83,7 @@ public class WebUtils {
         try {
             outResponse(in, response.getOutputStream());
         } catch (IOException e) {
-            logger.error("web response output stream error: {}", e.getMessage());
+            log.error("web response output stream error: {}", e.getMessage());
         }
     }
 
@@ -101,7 +99,7 @@ public class WebUtils {
             PrintWriter printWriter = new PrintWriter(response.getOutputStream());
             printWriter.write(content);
         } catch (IOException e) {
-            logger.error("response output stream error: {}", e.getMessage());
+            log.error("response output stream error: {}", e.getMessage());
         }
     }
 
@@ -193,6 +191,15 @@ public class WebUtils {
     public static String getCookieValue(HttpServletRequest request, String name) {
         Cookie cookie = getCookie(request, name);
         return cookie != null ? cookie.getValue() : null;
+    }
+
+    /**
+     * 移除指定名称的Cookie
+     * @param response
+     * @param name
+     */
+    public static void removeCookie( HttpServletResponse response, String name) {
+        setCookie(response, name, "", 0);
     }
 
 }

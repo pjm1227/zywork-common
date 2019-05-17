@@ -1,5 +1,9 @@
 package top.zywork.qiniu;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 七牛sdk配置基础类<br/>
  * 创建于2019-03-28<br/>
@@ -7,6 +11,9 @@ package top.zywork.qiniu;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class QiniuBaseConfig {
 
     /**
@@ -18,26 +25,4 @@ public class QiniuBaseConfig {
      */
     private String secretKey;
 
-    public QiniuBaseConfig() {}
-
-    public QiniuBaseConfig(String accessKey, String secretKey) {
-        this.accessKey = accessKey;
-        this.secretKey = secretKey;
-    }
-
-    public String getAccessKey() {
-        return accessKey;
-    }
-
-    public void setAccessKey(String accessKey) {
-        this.accessKey = accessKey;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
 }

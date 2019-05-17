@@ -1,9 +1,8 @@
 package top.zywork.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.util.ArrayList;
@@ -18,9 +17,8 @@ import java.util.List;
  * @version 1.0
  *
  */
+@Slf4j
 public class SchedulerUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(SchedulerUtils.class);
 
     private static Scheduler scheduler;
 
@@ -37,7 +35,7 @@ public class SchedulerUtils {
             try {
                 scheduler = new StdSchedulerFactory().getScheduler();
             } catch (SchedulerException e) {
-                logger.error("SchedulerFactory getScheduler error: {}", e.getMessage());
+                log.error("SchedulerFactory getScheduler error: {}", e.getMessage());
             }
         }
     }
@@ -68,15 +66,10 @@ public class SchedulerUtils {
         try {
             Class jobClass = Class.forName(jobClassName);
             JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(jobName, jobGroup).build();
-            Trigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerName, triggerGroup)
-                    .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)).build();
-            if (!scheduler.isStarted()) {
-                scheduler.start();
-            }
-            scheduler.scheduleJob(jobDetail, trigger);
+            scheduleJob(jobDetail, triggerName, triggerGroup, cronExpression);
             return true;
         } catch (SchedulerException | ClassNotFoundException e) {
-            logger.error("start job {} error: {}", jobClassName, e.getMessage());
+            log.error("start job {} error: {}", jobClassName, e.getMessage());
             return false;
         }
     }
@@ -112,17 +105,29 @@ public class SchedulerUtils {
             JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put(DATA_KEY, jobData);
             JobDetail jobDetail = JobBuilder.newJob(jobClass).setJobData(jobDataMap).withIdentity(jobName, jobGroup).build();
-            Trigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerName, triggerGroup)
-                    .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)).build();
-            if (!scheduler.isStarted()) {
-                scheduler.start();
-            }
-            scheduler.scheduleJob(jobDetail, trigger);
+            scheduleJob(jobDetail, triggerName, triggerGroup, cronExpression);
             return true;
         } catch (SchedulerException | ClassNotFoundException e) {
-            logger.error("start job {} with data error: {}", jobClassName, e.getMessage());
+            log.error("start job {} with data error: {}", jobClassName, e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * 执行任务计划
+     * @param jobDetail
+     * @param triggerName
+     * @param triggerGroup
+     * @param cronExpression
+     * @throws SchedulerException
+     */
+    private static void scheduleJob(JobDetail jobDetail, String triggerName, String triggerGroup, String cronExpression) throws SchedulerException {
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerName, triggerGroup)
+                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression)).build();
+        if (!scheduler.isStarted()) {
+            scheduler.start();
+        }
+        scheduler.scheduleJob(jobDetail, trigger);
     }
 
     /**
@@ -152,7 +157,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("pause job {} error: {}", jobName, e.getMessage());
+            log.error("pause job {} error: {}", jobName, e.getMessage());
             return false;
         }
     }
@@ -180,7 +185,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("resume job {} error: {}", jobName, e.getMessage());
+            log.error("resume job {} error: {}", jobName, e.getMessage());
             return false;
         }
     }
@@ -208,7 +213,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("pause trigger {} error: {}", triggerName, e.getMessage());
+            log.error("pause trigger {} error: {}", triggerName, e.getMessage());
             return false;
         }
     }
@@ -236,7 +241,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("resume trigger {} error: {}", triggerName, e.getMessage());
+            log.error("resume trigger {} error: {}", triggerName, e.getMessage());
             return false;
         }
     }
@@ -268,7 +273,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("stop job {} error: {}", jobName, e.getMessage());
+            log.error("stop job {} error: {}", jobName, e.getMessage());
             return false;
         }
     }
@@ -301,7 +306,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("restart running job {} error: {}", jobName, e.getMessage());
+            log.error("restart running job {} error: {}", jobName, e.getMessage());
             return false;
         }
     }
@@ -326,7 +331,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("stop all jobs error: {}", e.getMessage());
+            log.error("stop all jobs error: {}", e.getMessage());
             return false;
         }
     }
@@ -353,7 +358,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("modify job {} with new cron expression {} error: {}", jobName, cronExpression, e.getMessage());
+            log.error("modify job {} with new cron expression {} error: {}", jobName, cronExpression, e.getMessage());
             return false;
         }
     }
@@ -388,7 +393,7 @@ public class SchedulerUtils {
             }
             return true;
         } catch (SchedulerException e) {
-            logger.error("delete job {} error: {}", jobName, e.getMessage());
+            log.error("delete job {} error: {}", jobName, e.getMessage());
             return false;
         }
     }
@@ -421,7 +426,7 @@ public class SchedulerUtils {
         try {
             return scheduler.getCurrentlyExecutingJobs();
         } catch (SchedulerException e) {
-            logger.error("get executing jobs error: {}", e.getMessage());
+            log.error("get executing jobs error: {}", e.getMessage());
             return null;
         }
     }

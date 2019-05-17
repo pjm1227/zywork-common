@@ -2,7 +2,7 @@ package top.zywork.common;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 使用阿里api获取银行卡相关信息工具类<br/>
@@ -12,6 +12,8 @@ import org.apache.commons.lang.StringUtils;
  * @version 1.0
  */
 public class BankCardAliapiUtils {
+
+    private static final String VALIDATED = "validated";
 
     /**
      * 阿里银行卡信息接口
@@ -41,7 +43,7 @@ public class BankCardAliapiUtils {
         String cardInfoJsonString = getBankCardInfoJson(cardNo);
         if (StringUtils.isNotEmpty(cardInfoJsonString)) {
             JSONObject cardInfo = JSON.parseObject(cardInfoJsonString);
-            if (cardInfo.getBoolean("validated")) {
+            if (cardInfo.getBoolean(VALIDATED)) {
                 return getBankNameByBankCode(cardInfo.getString("bank"));
             }
         }
@@ -57,7 +59,7 @@ public class BankCardAliapiUtils {
         String cardInfoJsonString = getBankCardInfoJson(cardNo);
         if (StringUtils.isNotEmpty(cardInfoJsonString)) {
             JSONObject cardInfo = JSON.parseObject(cardInfoJsonString);
-            if (cardInfo.getBoolean("validated")) {
+            if (cardInfo.getBoolean(VALIDATED)) {
                 return cardInfo.getString("bank");
             }
         }
@@ -71,7 +73,7 @@ public class BankCardAliapiUtils {
      */
     public static String getBankNameByCardInfo(String cardInfoJsonString) {
         JSONObject cardInfo = JSON.parseObject(cardInfoJsonString);
-        if (cardInfo.getBoolean("validated")) {
+        if (cardInfo.getBoolean(VALIDATED)) {
             return getBankNameByBankCode(cardInfo.getString("bank"));
         }
         return null;
@@ -84,7 +86,7 @@ public class BankCardAliapiUtils {
      */
     public static String getBankCodeByCardInfo(String cardInfoJsonString) {
         JSONObject cardInfo = JSON.parseObject(cardInfoJsonString);
-        if (cardInfo.getBoolean("validated")) {
+        if (cardInfo.getBoolean(VALIDATED)) {
             return cardInfo.getString("bank");
         }
         return null;

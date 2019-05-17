@@ -1,5 +1,10 @@
 package top.zywork.weixin;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 存储微信公众号网页授权登录获取的access_token与openid的对象<br/>
  *
@@ -8,31 +13,19 @@ package top.zywork.weixin;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class GzhAuth {
 
+    /**
+     * accessToken
+     */
     private String accessToken;
+    /**
+     * openid
+     */
     private String openid;
 
-    public GzhAuth() {}
-
-    public GzhAuth(String accessToken, String openid) {
-        this.accessToken = accessToken;
-        this.openid = openid;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getOpenid() {
-        return openid;
-    }
-
-    public void setOpenid(String openid) {
-        this.openid = openid;
-    }
 }

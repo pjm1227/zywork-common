@@ -9,7 +9,6 @@ package top.zywork.enums;
  */
 public enum CheckStatusEnum {
 
-
     CHECKING(0, "审核中"),
     CHECKED(1, "已通过"),
     UNCHECKED(2, "未通过");
@@ -37,4 +36,5 @@ public enum CheckStatusEnum {
     public void setDes(String des) {
         this.des = des;
     }
+
 }

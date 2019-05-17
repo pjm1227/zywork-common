@@ -38,4 +38,5 @@ public enum FundsChangeTypeEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

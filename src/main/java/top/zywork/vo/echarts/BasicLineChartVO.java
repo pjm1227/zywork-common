@@ -1,5 +1,10 @@
 package top.zywork.vo.echarts;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
@@ -9,27 +14,21 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BasicLineChartVO {
 
     private List<String> xAxisData;
     private List<Number> seriesData;
 
-    public BasicLineChartVO() {}
-
-    public List<String> getxAxisData() {
-        return xAxisData;
-    }
-
     public void setxAxisData(List<String> xAxisData) {
         this.xAxisData = xAxisData;
     }
 
-    public List<Number> getSeriesData() {
-        return seriesData;
-    }
-
-    public void setSeriesData(List<Number> seriesData) {
-        this.seriesData = seriesData;
+    public List<String> getxAxisData() {
+        return xAxisData;
     }
 
 }

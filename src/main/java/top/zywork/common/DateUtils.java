@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -104,7 +105,7 @@ public class DateUtils {
      * @return 转换后的Instant实例
      */
     public static Instant localDateTimeToInstant(LocalDateTime localDateTime) {
-        return Instant.ofEpochMilli(millis(localDateTime));
+        return localDateTime.atZone(ZoneId.systemDefault()).toInstant();
     }
 
     /**

@@ -79,4 +79,5 @@ public enum MIMETypeEnum {
     public static MIMETypeEnum findByValue(String value) {
         return valueLookup.get(value);
     }
+
 }

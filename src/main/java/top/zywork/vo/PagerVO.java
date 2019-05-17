@@ -1,5 +1,10 @@
 package top.zywork.vo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /**
@@ -9,6 +14,10 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PagerVO extends BaseVO {
 
     private static final long serialVersionUID = 7596824634662805852L;
@@ -16,35 +25,4 @@ public class PagerVO extends BaseVO {
     private Long total;
     private List<Object> rows;
 
-    public PagerVO() {}
-
-    public PagerVO(Long total, List<Object> rows) {
-        this.total = total;
-        this.rows = rows;
-    }
-
-    public Long getTotal() {
-        return total;
-    }
-
-    public void setTotal(Long total) {
-        this.total = total;
-    }
-
-    public List<Object> getRows() {
-        return rows;
-    }
-
-    public void setRows(List<Object> rows) {
-        this.rows = rows;
-    }
-
-
-    @Override
-    public String toString() {
-        return "PagerVO{" +
-                "total=" + total +
-                ", rows=" + rows +
-                '}';
-    }
 }

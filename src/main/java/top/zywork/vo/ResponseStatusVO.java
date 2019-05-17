@@ -1,5 +1,9 @@
 package top.zywork.vo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import top.zywork.enums.ResponseStatusEnum;
 
 /**
@@ -10,62 +14,26 @@ import top.zywork.enums.ResponseStatusEnum;
  * @version 1.0
  * @see ResponseStatusEnum
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ResponseStatusVO extends BaseVO {
 
     private static final long serialVersionUID = 4997020566681368159L;
 
-    // 状态码
-    private Integer code;
-    // 返回消息
-    private String message;
-    // 返回数据
-    private Object data;
-
-    public ResponseStatusVO() {}
-
-    public ResponseStatusVO(Integer code, String message, Object data) {
-        this.code = code;
-        this.message = message;
-        this.data = data;
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
-
     /**
-     * 获取表示执行成功的结果
-     *
-     * @param code 状态码
-     * @param message 需要返回到前端页面的提示信息
-     * @param data 返回数据
+     * 状态码
      */
-    @Deprecated
-    public void okStatus(Integer code, String message, Object data) {
-        setCode(code);
-        setMessage(message);
-        setData(data);
-    }
+    private Integer code;
+    /**
+     * 返回消息
+     */
+    private String message;
+    /**
+     * 返回数据
+     */
+    private Object data;
 
     /**
      * 获取表示执行成功的结果
@@ -96,20 +64,6 @@ public class ResponseStatusVO extends BaseVO {
      * @param code 状态码
      * @param message 需要返回到前端页面的提示信息
      * @param data 返回数据
-     */
-    @Deprecated
-    public void errorStatus(Integer code, String message, Object data) {
-        setCode(code);
-        setMessage(message);
-        setData(data);
-    }
-
-    /**
-     * 获取表示执行失败的结果
-     *
-     * @param code 状态码
-     * @param message 需要返回到前端页面的提示信息
-     * @param data 返回数据
      * @return
      */
     public static ResponseStatusVO error(Integer code, String message, Object data) {
@@ -125,20 +79,6 @@ public class ResponseStatusVO extends BaseVO {
      */
     public static ResponseStatusVO error(String message, Object data) {
         return new ResponseStatusVO(ResponseStatusEnum.ERROR.getCode(), message, data);
-    }
-
-    /**
-     * 获取表示数据错误的结果
-     *
-     * @param code 状态码
-     * @param message 需要返回到前端页面的提示信息
-     * @param data 返回数据
-     */
-    @Deprecated
-    public void dataErrorStatus(Integer code, String message, Object data) {
-        setCode(code);
-        setMessage(message);
-        setData(data);
     }
 
     /**
@@ -180,12 +120,4 @@ public class ResponseStatusVO extends BaseVO {
         return new ResponseStatusVO(ResponseStatusEnum.AUTHORIZATION_ERROR.getCode(), ResponseStatusEnum.AUTHORIZATION_ERROR.getMessage(), null);
     }
 
-    @Override
-    public String toString() {
-        return "ResponseStatusVO{" +
-                "code=" + code +
-                ", message='" + message + '\'' +
-                ", data=" + data +
-                '}';
-    }
 }

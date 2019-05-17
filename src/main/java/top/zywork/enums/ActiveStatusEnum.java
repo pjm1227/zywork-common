@@ -35,4 +35,5 @@ public enum ActiveStatusEnum {
     public void setDes(String des) {
         this.des = des;
     }
+
 }

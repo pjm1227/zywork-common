@@ -37,4 +37,5 @@ public enum UploadTypeEnum {
     public void setMaxSize(Long maxSize) {
         this.maxSize = maxSize;
     }
+
 }

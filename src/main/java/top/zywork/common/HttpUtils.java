@@ -1,11 +1,12 @@
 package top.zywork.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -22,8 +23,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import top.zywork.enums.CharsetEnum;
 import top.zywork.enums.ContentTypeEnum;
 import top.zywork.enums.MIMETypeEnum;
@@ -40,9 +39,8 @@ import java.util.*;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class HttpUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     private static final HttpGet NONE_GET = null;
     private static final HttpPost NONE_POST = null;
@@ -57,6 +55,18 @@ public class HttpUtils {
             .setConnectTimeout(15000)
             .setConnectionRequestTimeout(15000)
             .build();
+
+    /**
+     * 重设timeout
+     * @param millis 毫秒数
+     */
+    public static void timeout(int millis) {
+        requestConfig = RequestConfig.custom()
+                .setSocketTimeout(millis)
+                .setConnectTimeout(millis)
+                .setConnectionRequestTimeout(millis)
+                .build();
+    }
 
     /**
      * HTTP GET请求访问指定的url
@@ -101,18 +111,7 @@ public class HttpUtils {
      * @return 指定url响应的字符串数据
      */
     public static String post(String url, Map<String, String> params) {
-        HttpPost httpPost = new HttpPost(url);
-        List<NameValuePair> nameValuePairs = new ArrayList<>();
-        Set<Map.Entry<String, String>> entrySet = params.entrySet();
-        for (Map.Entry<String, String> entry : entrySet) {
-            nameValuePairs.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-        }
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, CharsetEnum.UTF8.getValue()));
-        } catch (UnsupportedEncodingException e) {
-            logger.error("http post not supported encoding: {}", e.getMessage());
-        }
-        return send(NONE_GET, httpPost, stringResponseHandler);
+        return send(NONE_GET, buildHttpPost(url, params), stringResponseHandler);
     }
 
     /**
@@ -125,6 +124,16 @@ public class HttpUtils {
      * @return 指定url响应的字符串数据
      */
     public static String post(String url, Map<String, String> params, List<Cookie> cookieList, boolean getCookie) {
+        return send(NONE_GET, buildHttpPost(url, params), cookieList, getCookie, stringResponseHandler);
+    }
+
+    /**
+     * 构建http post请求
+     * @param url 请求url
+     * @param params 请求参数map
+     * @return
+     */
+    private static HttpPost buildHttpPost(String url, Map<String, String> params) {
         HttpPost httpPost = new HttpPost(url);
         List<NameValuePair> nameValuePairs = new ArrayList<>();
         Set<Map.Entry<String, String>> entrySet = params.entrySet();
@@ -134,9 +143,9 @@ public class HttpUtils {
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, CharsetEnum.UTF8.getValue()));
         } catch (UnsupportedEncodingException e) {
-            logger.error("http post not supported encoding: {}", e.getMessage());
+            log.error("http post not supported encoding: {}", e.getMessage());
         }
-        return send(NONE_GET, httpPost, cookieList, getCookie, stringResponseHandler);
+        return httpPost;
     }
 
     /**
@@ -222,11 +231,7 @@ public class HttpUtils {
      * @return 指定url响应的字符串数据
      */
     public static String post(String url, String data, MIMETypeEnum dataTypeEnum) {
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.addHeader("Content-type", dataTypeEnum.getMime() + "; charset=" + CharsetEnum.UTF8.getValue());
-        httpPost.addHeader("Accept", dataTypeEnum.getMime());
-        httpPost.setEntity(new StringEntity(data, CharsetEnum.UTF8.getValue()));
-        return send(NONE_GET, httpPost, stringResponseHandler);
+        return send(NONE_GET, buildHttpPost(url, data, dataTypeEnum), stringResponseHandler);
     }
 
     /**
@@ -240,11 +245,22 @@ public class HttpUtils {
      * @return 指定url响应的字符串数据，并获取由服务端返回的cookie数据
      */
     public static String post(String url, String data, MIMETypeEnum dataTypeEnum, List<Cookie> cookieList, boolean getCookie) {
+        return send(NONE_GET, buildHttpPost(url, data, dataTypeEnum), cookieList, getCookie, stringResponseHandler);
+    }
+
+    /**
+     * 构建http post请求
+     * @param url 请求url
+     * @param data 请求的字符串数据，如json或xml
+     * @param dataTypeEnum 指定请求的数据类型
+     * @return
+     */
+    private static HttpPost buildHttpPost(String url, String data, MIMETypeEnum dataTypeEnum) {
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader("Content-type", dataTypeEnum.getMime() + "; charset=" + CharsetEnum.UTF8.getValue());
         httpPost.addHeader("Accept", dataTypeEnum.getMime());
         httpPost.setEntity(new StringEntity(data, CharsetEnum.UTF8.getValue()));
-        return send(NONE_GET, httpPost, cookieList, getCookie, stringResponseHandler);
+        return httpPost;
     }
 
     /**
@@ -257,24 +273,13 @@ public class HttpUtils {
      * @return 通过在ResponseHandler中指定的具体类型来返回响应数据
      */
     private static <T> T send(HttpGet httpGet, HttpPost httpPost, ResponseHandler<T> responseHandler) {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
         T t = null;
-        try {
-            if (httpGet != null) {
-                httpGet.setConfig(requestConfig);
-                t = httpClient.execute(httpGet, responseHandler);
-            } else {
-                httpPost.setConfig(requestConfig);
-                t = httpClient.execute(httpPost, responseHandler);
-            }
+        try (
+                CloseableHttpClient httpClient = HttpClients.createDefault()
+        ) {
+           t = executeResponse(httpClient, httpGet, httpPost, responseHandler);
         } catch (IOException e) {
-            logger.error("http client execute error: {}", e.getMessage());
-        } finally {
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                logger.error("http client close error: {}", e.getMessage());
-            }
+            log.error("http client execute error: {}", e.getMessage());
         }
         return t;
     }
@@ -300,13 +305,36 @@ public class HttpUtils {
      * @return 通过在ResponseHandler中指定的具体类型来返回响应数据，并获取由服务端返回的cookie数据到cookies成员变量中
      */
     private static <T> T send(HttpGet httpGet, HttpPost httpPost, List<Cookie> cookieList, boolean getCookie, ResponseHandler<T> responseHandler) {
+        T t = null;
         CookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
-        if (cookieList != null) {
-            for (Cookie cookie : cookieList) {
-                cookieStore.addCookie(cookie);
+        try (
+                CloseableHttpClient httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build())
+        {
+            if (cookieList != null) {
+                for (Cookie cookie : cookieList) {
+                    cookieStore.addCookie(cookie);
+                }
             }
+            t = executeResponse(httpClient, httpGet, httpPost, responseHandler);
+            if (getCookie) {
+                cookies = cookieStore.getCookies();
+            }
+        } catch (IOException e) {
+            log.error("http client execute error: {}", e.getMessage());
         }
+        return t;
+    }
+
+    /**
+     * 执行http请求
+     * @param httpClient
+     * @param httpGet
+     * @param httpPost
+     * @param responseHandler
+     * @param <T>
+     * @return
+     */
+    private static <T> T executeResponse(HttpClient httpClient, HttpGet httpGet, HttpPost httpPost, ResponseHandler<T> responseHandler) {
         T t = null;
         try {
             if (httpGet != null) {
@@ -316,17 +344,8 @@ public class HttpUtils {
                 httpPost.setConfig(requestConfig);
                 t = httpClient.execute(httpPost, responseHandler);
             }
-            if (getCookie) {
-                cookies = cookieStore.getCookies();
-            }
         } catch (IOException e) {
-            logger.error("http client execute error: {}", e.getMessage());
-        } finally {
-            try {
-                httpClient.close();
-            } catch (IOException e) {
-                logger.error("http client close error: {}", e.getMessage());
-            }
+            log.error("http client execute error: {}", e.getMessage());
         }
         return t;
     }

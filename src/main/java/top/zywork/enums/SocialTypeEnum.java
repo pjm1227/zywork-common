@@ -28,4 +28,5 @@ public enum SocialTypeEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

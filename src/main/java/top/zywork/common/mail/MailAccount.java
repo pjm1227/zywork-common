@@ -1,5 +1,10 @@
 package top.zywork.common.mail;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 邮箱账户类，包括邮箱地址和邮箱的昵称<br/>
  * 创建于2017-09-14<br/>
@@ -7,38 +12,19 @@ package top.zywork.common.mail;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MailAccount {
 
+    /**
+     * 邮件地址
+     */
     private String address;
     /**
      * 昵称
      */
     private String personal;
 
-    public MailAccount() {}
-
-    public MailAccount(String address) {
-        this.address = address;
-    }
-
-    public MailAccount(String address, String personal) {
-        this(address);
-        this.personal = personal;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPersonal() {
-        return personal;
-    }
-
-    public void setPersonal(String personal) {
-        this.personal = personal;
-    }
 }

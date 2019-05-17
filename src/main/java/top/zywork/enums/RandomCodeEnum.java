@@ -26,4 +26,5 @@ public enum RandomCodeEnum {
     public void setValue(String value) {
         this.value = value;
     }
+
 }

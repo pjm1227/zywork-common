@@ -14,6 +14,8 @@ import java.util.List;
  */
 public class PropertyUtils {
 
+    private static final String COLUMN_WORD_SEPARATOR = "_";
+
     /**
      * 获取属性的getter方法名称
      * @param property 属性名
@@ -38,9 +40,9 @@ public class PropertyUtils {
      * @return 表字段对应的对象属性名
      */
     public static String columnToProperty(String column) {
-        StringBuilder property = new StringBuilder("");
-        if (column.contains("_")) {
-            String[] strArray = column.split("_");
+        StringBuilder property = new StringBuilder();
+        if (column.contains(COLUMN_WORD_SEPARATOR)) {
+            String[] strArray = column.split(COLUMN_WORD_SEPARATOR);
             property.append(strArray[0]);
             for (int i = 1, len = strArray.length; i < len; i++) {
                 property.append(StringUtils.capitalize(strArray[i]));
@@ -67,7 +69,7 @@ public class PropertyUtils {
         int underLineCount = 0;
         for (Integer upperCaseIndex : upperCaseIndexes) {
             int underLineIndex = upperCaseIndex + underLineCount;
-            characterList.add(underLineIndex, '_');
+            characterList.add(underLineIndex, COLUMN_WORD_SEPARATOR.charAt(0));
             characterList.set(underLineIndex + 1, (char) (characterList.get(underLineIndex + 1) + 32));
             underLineCount++;
         }

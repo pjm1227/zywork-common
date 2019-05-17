@@ -1,7 +1,7 @@
 package top.zywork.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import top.zywork.common.gif.AnimatedGifEncoder;
 import top.zywork.common.gif.GifDecoder;
 
@@ -17,10 +17,9 @@ import java.io.OutputStream;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class ImageCompressUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ImageCompressUtils.class);
-
+    
     /**
      * 把图片按照指定的比例进行压缩，减小到指定的大小
      * @param bufferedImage 原图BufferedImage
@@ -32,10 +31,7 @@ public class ImageCompressUtils {
         int height = bufferedImage.getHeight();
         int newWidth = (int) (width * scale);
         int newHeight = (int) (height * scale);
-        BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-        Graphics graphics = newImage.getGraphics();
-        graphics.drawImage(bufferedImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
-        return newImage;
+       return newBufferedImage(bufferedImage, newWidth, newHeight);
     }
 
     /**
@@ -58,12 +54,23 @@ public class ImageCompressUtils {
                 // 按照高度比例来压缩
                 newWidth = (int) (width * heightScale);
             }
-            BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-            Graphics graphics = newImage.getGraphics();
-            graphics.drawImage(bufferedImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
-            return newImage;
+            return newBufferedImage(bufferedImage, newWidth, newHeight);
         }
         return bufferedImage;
+    }
+
+    /**
+     * 以新的尺寸创建BufferedImage
+     * @param bufferedImage
+     * @param newWidth
+     * @param newHeight
+     * @return
+     */
+    private static BufferedImage newBufferedImage(BufferedImage bufferedImage, int newWidth, int newHeight) {
+        BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics graphics = newImage.getGraphics();
+        graphics.drawImage(bufferedImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
+        return newImage;
     }
 
     /**
@@ -131,12 +138,9 @@ public class ImageCompressUtils {
      * @param outputStream 输出流，可以是FileOutputStream，也可以是response.getOutputStream
      */
     public static void compressGif(String path, float scale, OutputStream outputStream) {
-        GifDecoder gifDecoder = new GifDecoder();
-        int status = gifDecoder.read(path);
-        if (status == GifDecoder.STATUS_OK) {
+        GifDecoder gifDecoder = getGifDecoder(path, null);
+        if (gifDecoder != null) {
             writeGifToOutputStream(gifDecoder, scale, outputStream);
-        } else {
-            logger.error("read gif error");
         }
     }
 
@@ -148,12 +152,9 @@ public class ImageCompressUtils {
      * @param outputStream 输出流，可以是FileOutputStream，也可以是response.getOutputStream
      */
     public static void compressGif(String path, int newWidth, int newHeight, OutputStream outputStream) {
-        GifDecoder gifDecoder = new GifDecoder();
-        int status = gifDecoder.read(path);
-        if (status == GifDecoder.STATUS_OK) {
+        GifDecoder gifDecoder = getGifDecoder(path, null);
+        if (gifDecoder != null) {
             writeGifToOutputStream(gifDecoder, newWidth, newHeight, outputStream);
-        } else {
-            logger.error("read gif error");
         }
     }
 
@@ -164,12 +165,9 @@ public class ImageCompressUtils {
      * @param outputStream 输出流，可以是FileOutputStream，也可以是response.getOutputStream
      */
     public static void compressGif(InputStream inputStream, float scale, OutputStream outputStream) {
-        GifDecoder gifDecoder = new GifDecoder();
-        int status = gifDecoder.read(inputStream);
-        if (status == GifDecoder.STATUS_OK) {
+        GifDecoder gifDecoder = getGifDecoder(null, inputStream);
+        if (gifDecoder != null) {
             writeGifToOutputStream(gifDecoder, scale, outputStream);
-        } else {
-            logger.error("read gif error");
         }
     }
 
@@ -181,12 +179,31 @@ public class ImageCompressUtils {
      * @param outputStream 输出流，可以是FileOutputStream，也可以是response.getOutputStream
      */
     public static void compressGif(InputStream inputStream, int newWidth, int newHeight, OutputStream outputStream) {
-        GifDecoder gifDecoder = new GifDecoder();
-        int status = gifDecoder.read(inputStream);
-        if (status == GifDecoder.STATUS_OK) {
+        GifDecoder gifDecoder = getGifDecoder(null, inputStream);
+        if (gifDecoder != null) {
             writeGifToOutputStream(gifDecoder, newWidth, newHeight, outputStream);
+        }
+    }
+
+    /**
+     * 读取GifDecoder，参数二者选其一
+     * @param path
+     * @param inputStream
+     * @return
+     */
+    private static GifDecoder getGifDecoder(String path, InputStream inputStream) {
+        GifDecoder gifDecoder = new GifDecoder();
+        int status = -1;
+        if (StringUtils.isNotEmpty(path)) {
+            status = gifDecoder.read(path);
+        } else if (inputStream != null) {
+            status = gifDecoder.read(inputStream);
+        }
+        if (status == GifDecoder.STATUS_OK) {
+            return gifDecoder;
         } else {
-            logger.error("read gif error");
+            log.error("read gif error");
+            return null;
         }
     }
 

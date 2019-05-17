@@ -1,5 +1,9 @@
 package top.zywork.weixin;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 微信配置基础类<br/>
  * 创建于2018-12-17<br/>
@@ -7,22 +11,14 @@ package top.zywork.weixin;
  * @author 王振宇
  * @version 1.0
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class WeixinBaseConfig {
 
-    // base url
+    /**
+     * base url
+     */
     private String baseUrl;
 
-    public WeixinBaseConfig() {}
-
-    public WeixinBaseConfig(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
 }

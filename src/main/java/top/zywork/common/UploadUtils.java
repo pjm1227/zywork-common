@@ -1,8 +1,11 @@
 package top.zywork.common;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import top.zywork.enums.MIMETypeEnum;
 import top.zywork.enums.ResponseStatusEnum;
@@ -25,9 +28,8 @@ import java.util.List;
  * @author 王振宇
  * @version 1.0
  */
+@Slf4j
 public class UploadUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(UploadUtils.class);
 
     /**
      * 检测上传文件是否符合格式及大小要求
@@ -64,10 +66,10 @@ public class UploadUtils {
             String fileName = file.getOriginalFilename();
             long fileSize = file.getSize();
             if (fileSize > maxSize) {
-                errorInfo.append("第" + (i + 1) + "个文件超过最大文件限制，最大大小：" + maxSize / 1024 / 1024 + "MB\n");
+                errorInfo.append("第").append(i + 1).append("个文件超过最大文件限制，最大大小：").append(maxSize / 1024 / 1024).append("MB\n");
             }
             if (!FileUtils.checkExt(fileName, allowedExts)) {
-                errorInfo.append("第" + (i + 1) + "个文件类型错误，后缀只能是：" + allowedExts + "\n");
+                errorInfo.append("第").append(i + 1).append("个文件类型错误，后缀只能是：").append(allowedExts).append("\n");
             }
         }
         if (StringUtils.isEmpty(errorInfo.toString())) {
@@ -161,7 +163,7 @@ public class UploadUtils {
             }
             return ResponseStatusVO.ok("文件上传成功", newFileName + fullExt);
         } catch (IOException e) {
-            logger.error("save upload file error: {}", e.getMessage());
+            log.error("save upload file error: {}", e.getMessage());
             return ResponseStatusVO.dataError("文件上传错误，稍候再试", null);
         }
     }
@@ -250,72 +252,23 @@ public class UploadUtils {
         return fileNameWithoutExt + "_" + (int) (scale * 10) + fullExt;
     }
 
+    /**
+     * 上传选项类
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class UploadOptions {
         private String uploadParentDir;
         private String uploadDir;
-        private int[][] compressSizes;
-        private float[] compressScales;
+        private Integer[][] compressSizes;
+        private Float[] compressScales;
         private String dbSaveUrl;
-
-        public UploadOptions() {}
-
-        public UploadOptions(String uploadParentDir, String uploadDir, String dbSaveUrl) {
-            this.uploadParentDir = uploadParentDir;
-            this.uploadDir = uploadDir;
-            this.dbSaveUrl = dbSaveUrl;
-        }
-
-        public UploadOptions(String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales, String dbSaveUrl) {
-            this.uploadParentDir = uploadParentDir;
-            this.uploadDir = uploadDir;
-            this.compressSizes = compressSizes;
-            this.compressScales = compressScales;
-            this.dbSaveUrl = dbSaveUrl;
-        }
-
-        public String getUploadParentDir() {
-            return uploadParentDir;
-        }
-
-        public void setUploadParentDir(String uploadParentDir) {
-            this.uploadParentDir = uploadParentDir;
-        }
-
-        public String getUploadDir() {
-            return uploadDir;
-        }
-
-        public void setUploadDir(String uploadDir) {
-            this.uploadDir = uploadDir;
-        }
-
-        public int[][] getCompressSizes() {
-            return compressSizes;
-        }
-
-        public void setCompressSizes(int[][] compressSizes) {
-            this.compressSizes = compressSizes;
-        }
-
-        public float[] getCompressScales() {
-            return compressScales;
-        }
-
-        public void setCompressScales(float[] compressScales) {
-            this.compressScales = compressScales;
-        }
-
-        public String getDbSaveUrl() {
-            return dbSaveUrl;
-        }
-
-        public void setDbSaveUrl(String dbSaveUrl) {
-            this.dbSaveUrl = dbSaveUrl;
-        }
 
         public void generateCompressSizes(String compressSizesStr) {
             String[] strArray = compressSizesStr.split(",");
-            this.compressSizes = new int[strArray.length][2];
+            this.compressSizes = new Integer[strArray.length][2];
             for (int i = 0, len = strArray.length; i < len; i++) {
                 String[] sizeArray = strArray[i].split("x");
                 this.compressSizes[i][0] = Integer.valueOf(sizeArray[0]);
@@ -325,7 +278,7 @@ public class UploadUtils {
 
         public void generateCompressScales(String compressScalesStr) {
             String[] strArray = compressScalesStr.split(",");
-            this.compressScales = new float[strArray.length];
+            this.compressScales = new Float[strArray.length];
             for (int i = 0, len = strArray.length; i < len; i++) {
                 this.compressScales[i] = Float.valueOf(strArray[i]);
             }

@@ -12,7 +12,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * 时间格式化工具<br/>
@@ -23,7 +22,7 @@ import java.util.function.Supplier;
  */
 public class DateFormatUtils {
 
-    public static Map<String, ThreadLocal<DateFormat>> dfMap = new HashMap<String, ThreadLocal<DateFormat>>();
+    private static Map<String, ThreadLocal<DateFormat>> dateFormatThreadLocalMap = new HashMap<>();
 
     /**
      * 通过指定的格式获取SimpleDateFormat类的实例，考虑线程安全
@@ -31,14 +30,14 @@ public class DateFormatUtils {
      * @return SimpleDateFormat类的实例
      */
     public static DateFormat getDateFormat(final String pattern) {
-        ThreadLocal<DateFormat> dfThreadLocal = dfMap.get(pattern);
-        if (dfThreadLocal == null) {
+        ThreadLocal<DateFormat> dateFormatThreadLocal = dateFormatThreadLocalMap.get(pattern);
+        if (dateFormatThreadLocal == null) {
             synchronized (DateFormatUtils.class) {
-                dfThreadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat(pattern));
-                dfMap.put(pattern, dfThreadLocal);
+                dateFormatThreadLocal = ThreadLocal.withInitial(() -> new SimpleDateFormat(pattern));
+                dateFormatThreadLocalMap.put(pattern, dateFormatThreadLocal);
             }
         }
-        return dfThreadLocal.get();
+        return dateFormatThreadLocal.get();
     }
 
     /**
