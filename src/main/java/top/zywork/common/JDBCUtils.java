@@ -19,7 +19,7 @@ public class JDBCUtils {
      * @param jdbcType
      * @return
      */
-    public String getJavaType(String jdbcType) {
+    public static String getJavaType(String jdbcType) {
         switch(jdbcType){
             case "VARCHAR":
             case "VARCHAR2":
@@ -59,7 +59,7 @@ public class JDBCUtils {
      * @param jdbcType
      * @return
      */
-    public Object convert(String value, String jdbcType) {
+    public static Object convert(String value, String jdbcType) {
         switch(jdbcType){
             case "VARCHAR":
             case "VARCHAR2":
