@@ -313,7 +313,7 @@ public class ReflectUtils {
             // 过滤掉所有内部类
             if (name.endsWith(CLASS_SUFFIX) && !isInnerClass(name)) {
                 String className = name.replace(CLASS_SUFFIX, "")
-                        .replace(File.separator, ".");
+                        .replace(FileConstants.SEPARATOR, ".");
                 if (isClassWithAnnotation(className, annotation)) {
                     classNames.add(className);
                 }
@@ -337,7 +337,7 @@ public class ReflectUtils {
             // 过滤掉所有内部类
             if (name.endsWith(CLASS_SUFFIX) && !isInnerClass(name)) {
                 String className = name.replace(CLASS_SUFFIX, "")
-                        .replace(File.separator, ".");
+                        .replace(FileConstants.SEPARATOR, ".");
                 addToClassesList(classes, className, annotation);
             }
         }

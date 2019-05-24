@@ -88,7 +88,7 @@ public class UploadUtils {
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static ResponseStatusVO upload(MultipartFile file, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+    public static ResponseStatusVO upload(MultipartFile file, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales) {
         return save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales);
     }
 
@@ -102,7 +102,7 @@ public class UploadUtils {
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static ResponseStatusVO upload(MultipartFile[] files, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+    public static ResponseStatusVO upload(MultipartFile[] files, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales) {
         int errorCount = 0;
         List<Object> fileNames = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -127,7 +127,7 @@ public class UploadUtils {
      * @param compressScales
      * @return
      */
-    private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, int[][] compressSizes, float[] compressScales) {
+    private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales) {
         String saveDir = FileUtils.mkdirs(uploadParentDir, uploadDir);
         String newFileName = FileUtils.newFileNameWithoutExt(fileName);
         String fullExt = FileUtils.getFullExt(fileName);
@@ -136,7 +136,7 @@ public class UploadUtils {
             file.transferTo(newFile);
             if (compressSizes != null) {
                 // 需要按指定大小压缩
-                for (int[] size : compressSizes) {
+                for (Integer[] size : compressSizes) {
                     String uploadFileName = uploadFileName(newFileName, fullExt, size);
                     String newFilePath = saveDir + File.separator + uploadFileName;
                     if (MIMETypeEnum.GIF.getExt().equalsIgnoreCase(fullExt)) {
@@ -177,7 +177,7 @@ public class UploadUtils {
      * @param compressSizes   指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
      * @return
      */
-    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, int[][] compressSizes) {
+    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, Integer[][] compressSizes) {
         return upload(file, uploadParentDir, uploadDir, compressSizes, null);
     }
 
@@ -190,7 +190,7 @@ public class UploadUtils {
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, float[] compressScales) {
+    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, Float[] compressScales) {
         return upload(file, uploadParentDir, uploadDir, null, compressScales);
     }
 
@@ -203,7 +203,7 @@ public class UploadUtils {
      * @param compressSizes   指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
      * @return
      */
-    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, int[][] compressSizes) {
+    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, Integer[][] compressSizes) {
         return upload(files, uploadParentDir, uploadDir, compressSizes, null);
     }
 
@@ -216,7 +216,7 @@ public class UploadUtils {
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
      * @return
      */
-    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, float[] compressScales) {
+    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, Float[] compressScales) {
         return upload(files, uploadParentDir, uploadDir, null, compressScales);
     }
 
@@ -244,11 +244,11 @@ public class UploadUtils {
         return upload(files, uploadParentDir, uploadDir, null, null);
     }
 
-    private static String uploadFileName(String fileNameWithoutExt, String fullExt, int[] size) {
+    private static String uploadFileName(String fileNameWithoutExt, String fullExt, Integer[] size) {
         return fileNameWithoutExt + "_" + size[0] + "x" + size[1] + fullExt;
     }
 
-    private static String uploadFileName(String fileNameWithoutExt, String fullExt, float scale) {
+    private static String uploadFileName(String fileNameWithoutExt, String fullExt, Float scale) {
         return fileNameWithoutExt + "_" + (int) (scale * 10) + fullExt;
     }
 
