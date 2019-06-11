@@ -1,6 +1,6 @@
 package top.zywork.common;
 
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * 字节数组编码工具类<br/>
@@ -35,7 +35,7 @@ public class ByteUtils {
      * @return base64编码后的字符串
      */
     public static String toBase64(byte[] bytes) {
-        return new BASE64Encoder().encode(bytes);
+        return Base64.encodeBase64String(bytes);
     }
 
 }

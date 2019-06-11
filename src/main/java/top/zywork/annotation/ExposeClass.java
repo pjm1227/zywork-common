@@ -15,9 +15,21 @@ import java.lang.annotation.*;
 public @interface ExposeClass {
 
     /**
+     * 类的名称
+     * @return
+     */
+    String name() default "";
+
+    /**
      * 用于描述类的类型，如 type = "job"
      * @return
      */
     String type() default "";
+
+    /**
+     * 类的描述信息
+     * @return
+     */
+    String description() default "";
 
 }

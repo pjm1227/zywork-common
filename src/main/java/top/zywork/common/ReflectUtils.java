@@ -18,6 +18,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -412,23 +413,41 @@ public class ReflectUtils {
      * @return
      */
     public static List<String> getExposeClassNames(String packageName, Boolean recursive, String type) {
-        List<Class<?>> classes = getClasses(packageName, recursive, ExposeClass.class);
+        List<Class<?>> classes = getExposeClasses(packageName, recursive, type);
         List<String> classNames = new ArrayList<>();
         if (classes != null && classes.size() > 0) {
-            if (StringUtils.isEmpty(type)) {
-                for (Class<?> clazz : classes) {
-                    classNames.add(clazz.getName());
-                }
-            } else {
-                for (Class<?> clazz : classes) {
-                    ExposeClass exposeClass = clazz.getDeclaredAnnotation(ExposeClass.class);
-                    if (type.equals(exposeClass.type())) {
-                        classNames.add(clazz.getName());
-                    }
-                }
+            for (Class<?> clazz : classes) {
+                classNames.add(clazz.getName());
             }
         }
         return classNames;
+    }
+
+    /**
+     * 获取带有ExposeClass注解的类，并可指定ExposeClass的type
+     * @param packageName
+     * @param recursive
+     * @param type
+     * @return
+     */
+    public static List<Class<?>> getExposeClasses(String packageName, Boolean recursive, String type) {
+        List<Class<?>> classes = getClasses(packageName, recursive, ExposeClass.class);
+        if (classes != null && classes.size() > 0) {
+            if (StringUtils.isEmpty(type)) {
+                return classes;
+            } else {
+                Iterator<Class<?>> iterator = classes.iterator();
+                while (iterator.hasNext()) {
+                    Class<?> clazz = iterator.next();
+                    ExposeClass exposeClass = clazz.getDeclaredAnnotation(ExposeClass.class);
+                    if (!type.equals(exposeClass.type())) {
+                        iterator.remove();
+                    }
+                }
+                return classes;
+            }
+        }
+        return classes;
     }
 
 }
