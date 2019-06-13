@@ -86,10 +86,11 @@ public class UploadUtils {
      * @param uploadDir       上传子目录，可以带有下级目录
      * @param compressSizes   指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO upload(MultipartFile file, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales) {
-        return save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales);
+    public static ResponseStatusVO upload(MultipartFile file, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales, Boolean keepFileName) {
+        return save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales, keepFileName);
     }
 
     /**
@@ -100,13 +101,14 @@ public class UploadUtils {
      * @param uploadDir       上传子目录，可以带有下级目录
      * @param compressSizes   指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO upload(MultipartFile[] files, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales) {
+    public static ResponseStatusVO upload(MultipartFile[] files, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales, Boolean keepFileName) {
         int errorCount = 0;
         List<Object> fileNames = new ArrayList<>();
         for (MultipartFile file : files) {
-            ResponseStatusVO statusVO = save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales);
+            ResponseStatusVO statusVO = save(file, file.getOriginalFilename(), uploadParentDir, uploadDir, compressSizes, compressScales, keepFileName);
             fileNames.add(statusVO.getData());
             if (statusVO.getCode().intValue() == ResponseStatusEnum.DATA_ERROR.getCode()) {
                 errorCount++;
@@ -125,12 +127,16 @@ public class UploadUtils {
      * @param uploadDir
      * @param compressSizes
      * @param compressScales
+     * @param keepFileName
      * @return
      */
-    private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales) {
+    private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales, Boolean keepFileName) {
         String saveDir = FileUtils.mkdirs(uploadParentDir, uploadDir);
-        String newFileName = FileUtils.newFileNameWithoutExt(fileName);
+        String newFileName = fileName;
         String fullExt = FileUtils.getFullExt(fileName);
+        if (!keepFileName) {
+            newFileName = FileUtils.newFileNameWithoutExt(fileName);
+        }
         File newFile = new File(saveDir, newFileName + fullExt);
         try {
             file.transferTo(newFile);
@@ -175,10 +181,11 @@ public class UploadUtils {
      * @param uploadParentDir 上传父目录
      * @param uploadDir       上传子目录，可以带有下级目录
      * @param compressSizes   指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, Integer[][] compressSizes) {
-        return upload(file, uploadParentDir, uploadDir, compressSizes, null);
+    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Boolean keepFileName) {
+        return upload(file, uploadParentDir, uploadDir, compressSizes, null, keepFileName);
     }
 
     /**
@@ -188,10 +195,11 @@ public class UploadUtils {
      * @param uploadParentDir 上传父目录
      * @param uploadDir       上传子目录，可以带有下级目录
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, Float[] compressScales) {
-        return upload(file, uploadParentDir, uploadDir, null, compressScales);
+    public static ResponseStatusVO uploadImg(MultipartFile file, String uploadParentDir, String uploadDir, Float[] compressScales, Boolean keepFileName) {
+        return upload(file, uploadParentDir, uploadDir, null, compressScales, keepFileName);
     }
 
     /**
@@ -201,10 +209,11 @@ public class UploadUtils {
      * @param uploadParentDir 上传父目录
      * @param uploadDir       上传子目录，可以带有下级目录
      * @param compressSizes   指定图片压缩大小，二维数组的形式指定多个压缩大小，如{{200, 200}, {500, 500}}。第一个数字为宽度，第二个数字为高度
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, Integer[][] compressSizes) {
-        return upload(files, uploadParentDir, uploadDir, compressSizes, null);
+    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Boolean keepFileName) {
+        return upload(files, uploadParentDir, uploadDir, compressSizes, null, keepFileName);
     }
 
     /**
@@ -214,10 +223,11 @@ public class UploadUtils {
      * @param uploadParentDir 上传父目录
      * @param uploadDir       上传子目录，可以带有下级目录
      * @param compressScales  指定图片压缩比例，如{0.8, 0.5}表示分别需要按0.8和0.5的比例进行压缩
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, Float[] compressScales) {
-        return upload(files, uploadParentDir, uploadDir, null, compressScales);
+    public static ResponseStatusVO uploadImgs(MultipartFile[] files, String uploadParentDir, String uploadDir, Float[] compressScales, Boolean keepFileName) {
+        return upload(files, uploadParentDir, uploadDir, null, compressScales, keepFileName);
     }
 
     /**
@@ -226,10 +236,11 @@ public class UploadUtils {
      * @param file            单个文件
      * @param uploadParentDir 上传父目录
      * @param uploadDir       上传子目录，可以带有下级目录
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO uploadFile(MultipartFile file, String uploadParentDir, String uploadDir) {
-        return upload(file, uploadParentDir, uploadDir, null, null);
+    public static ResponseStatusVO uploadFile(MultipartFile file, String uploadParentDir, String uploadDir, Boolean keepFileName) {
+        return upload(file, uploadParentDir, uploadDir, null, null, keepFileName);
     }
 
     /**
@@ -238,10 +249,11 @@ public class UploadUtils {
      * @param files           多个文件
      * @param uploadParentDir 上传父目录
      * @param uploadDir       上传子目录，可以带有下级目录
+     * @param keepFileName 是否操持原始原件名
      * @return
      */
-    public static ResponseStatusVO uploadFiles(MultipartFile[] files, String uploadParentDir, String uploadDir) {
-        return upload(files, uploadParentDir, uploadDir, null, null);
+    public static ResponseStatusVO uploadFiles(MultipartFile[] files, String uploadParentDir, String uploadDir, Boolean keepFileName) {
+        return upload(files, uploadParentDir, uploadDir, null, null, keepFileName);
     }
 
     private static String uploadFileName(String fileNameWithoutExt, String fullExt, Integer[] size) {
@@ -265,6 +277,7 @@ public class UploadUtils {
         private Integer[][] compressSizes;
         private Float[] compressScales;
         private String dbSaveUrl;
+        private Boolean keepFileName;
 
         public void generateCompressSizes(String compressSizesStr) {
             String[] strArray = compressSizesStr.split(",");
