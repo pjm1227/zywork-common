@@ -132,7 +132,7 @@ public class UploadUtils {
      */
     private static ResponseStatusVO save(MultipartFile file, String fileName, String uploadParentDir, String uploadDir, Integer[][] compressSizes, Float[] compressScales, Boolean keepFileName) {
         String saveDir = FileUtils.mkdirs(uploadParentDir, uploadDir);
-        String newFileName = fileName;
+        String newFileName = FileUtils.getFileNameWithoutExt(fileName);
         String fullExt = FileUtils.getFullExt(fileName);
         if (!keepFileName) {
             newFileName = FileUtils.newFileNameWithoutExt(fileName);
