@@ -9,8 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import top.zywork.common.HttpUtils;
 import top.zywork.common.IOUtils;
 import top.zywork.common.UUIDUtils;
-import top.zywork.enums.CharsetEnum;
-import top.zywork.enums.ContentTypeEnum;
+import top.zywork.enums.*;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -335,15 +334,16 @@ public class WeixinUtils {
      * @param actName 活动名称
      * @param remark 备注
      * @param sceneId 非普通红包必传，参考RedpackSceneEnum枚举
+     * @param certPath 证书路径
      * @return 发送红包的结果 Map
      */
     public static Map<String, String> sendRedpack(String appid, String mchId, String apiKey, String openid, String ip, String mchBillNo,
-                                   String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId) {
+                                   String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId, String certPath) {
         Map<String, String> redpackData = redpackData(appid, mchId, apiKey, openid, ip, mchBillNo, sendName, totalAmount, totalNum, wishing, actName, wishing, sceneId);
         try {
-            String redpackResult = HttpUtils.postXML(PayConstants.SEND_RED_PACK, WXPayUtil.mapToXml(redpackData));
+            String redpackResult = HttpUtils.post(PayConstants.SEND_RED_PACK, WXPayUtil.mapToXml(redpackData), MIMETypeEnum.XML,
+                    certPath, mchId, CertTypeEnum.PKCS12.getValue(), new String[]{SSLProtocolEnum.TLSv1.getValue()});
             if (redpackResult != null) {
-                redpackResult = new String(redpackResult.getBytes(CharsetEnum.ISO8859_1.getValue()), CharsetEnum.UTF8.getValue());
                 return WXPayUtil.xmlToMap(redpackResult);
             }
         } catch (Exception e) {
