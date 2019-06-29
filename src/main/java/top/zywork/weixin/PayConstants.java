@@ -33,7 +33,17 @@ public class PayConstants {
     /**
      * 微信公众号发送普通红包api地址
      */
-    public static final String SEND_RED_PACK = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
+    public static final String SEND_RED_PACK_GZH = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack";
+
+    /**
+     * 微信小程序发送普通红包api地址
+     */
+    public static final String SEND_RED_PACK_XCX = "https://api.mch.weixin.qq.com/mmpaymkttransfers/sendminiprogramhb";
+
+    /**
+     * 微信企业付款到个人api
+     */
+    public static final String TRANSFER_TO_PERSONAL = "https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers";
 
     /**
      * 响应微信支付结果的内容

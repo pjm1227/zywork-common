@@ -337,17 +337,17 @@ public class WeixinUtils {
      * @param certPath 证书路径
      * @return 发送红包的结果 Map
      */
-    public static Map<String, String> sendRedpack(String appid, String mchId, String apiKey, String openid, String ip, String mchBillNo,
+    public static Map<String, String> sendRedpackGzh(String appid, String mchId, String apiKey, String openid, String ip, String mchBillNo,
                                    String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId, String certPath) {
-        Map<String, String> redpackData = redpackData(appid, mchId, apiKey, openid, ip, mchBillNo, sendName, totalAmount, totalNum, wishing, actName, wishing, sceneId);
+        Map<String, String> redpackData = redpackData(appid, mchId, apiKey, openid, ip, mchBillNo, sendName, totalAmount, totalNum, wishing, actName, remark, sceneId);
         try {
-            String redpackResult = HttpUtils.post(PayConstants.SEND_RED_PACK, WXPayUtil.mapToXml(redpackData), MIMETypeEnum.XML,
+            String redpackResult = HttpUtils.post(PayConstants.SEND_RED_PACK_GZH, WXPayUtil.mapToXml(redpackData), MIMETypeEnum.XML,
                     certPath, mchId, CertTypeEnum.PKCS12.getValue(), new String[]{SSLProtocolEnum.TLSv1.getValue()});
             if (redpackResult != null) {
                 return WXPayUtil.xmlToMap(redpackResult);
             }
         } catch (Exception e) {
-            log.error("sendRedpack error: {}", e.getMessage());
+            log.error("sendRedpackGzh error: {}", e.getMessage());
         }
         return null;
     }
@@ -367,6 +367,82 @@ public class WeixinUtils {
         redpackResult.setSendListid(redpackResultMap.get("send_listid"));
         redpackResult.setTotalAmount(Integer.valueOf(redpackResultMap.get("total_amount")));
         return redpackResult;
+    }
+
+    /**
+     * 为企业付款到个人准备数据
+     * @param mchAppid
+     * @param mchId
+     * @param apiKey
+     * @param openid
+     * @param ip
+     * @param partnerTradeNo
+     * @param amount
+     * @param checkName
+     * @param desc
+     * @return
+     */
+    public static Map<String, String> transferToPersonalData(String mchAppid, String mchId, String apiKey, String openid,
+                                                             String ip, String partnerTradeNo, int amount, String checkName, String desc) {
+        Map<String, String> data = new HashMap<>();
+        data.put("mch_appid", mchAppid);
+        data.put("mchid", mchId);
+        data.put("nonce_str", UUIDUtils.simpleUuid());
+        data.put("openid", openid);
+        data.put("spbill_create_ip", ip);
+        data.put("partner_trade_no", partnerTradeNo);
+        data.put("amount", amount + "");
+        data.put("check_name", checkName);
+        data.put("desc", desc);
+        try {
+            data.put("sign", WXPayUtil.generateSignature(data, apiKey, WXPayConstants.SignType.MD5));
+        } catch (Exception e) {
+            log.error("transfer to personal data error: {}", e.getMessage());
+        }
+        return data;
+    }
+
+    /**
+     * 微信企业付款到个人
+     * @param mchAppid 申请商户号的appid或商户号绑定的appid
+     * @param mchId 商户id
+     * @param apiKey 商户apiket
+     * @param openid 用户openid
+     * @param ip 调用接口的ip地址
+     * @param partnerTradeNo 商户订单号
+     * @param amount 支付总金额，单位为分
+     * @param checkName 是否校验用户真实姓名，NO_CHECK：不校验真实姓名，FORCE_CHECK：强校验真实姓名
+     * @param desc 企业付款备注
+     */
+    public static Map<String, String> transferToPersonal(String mchAppid, String mchId, String apiKey, String openid, String ip,
+                                                         String partnerTradeNo, int amount, String checkName, String desc, String certPath) {
+        Map<String, String> transferToPersonalData = transferToPersonalData(mchAppid, mchId, apiKey, openid, ip,partnerTradeNo, amount, checkName, desc);
+        try {
+            String transferResult = HttpUtils.post(PayConstants.TRANSFER_TO_PERSONAL, WXPayUtil.mapToXml(transferToPersonalData), MIMETypeEnum.XML,
+                    certPath, mchId, CertTypeEnum.PKCS12.getValue(), new String[]{SSLProtocolEnum.TLSv1.getValue()});
+            if (transferResult != null) {
+                return WXPayUtil.xmlToMap(transferResult);
+            }
+        } catch (Exception e) {
+            log.error("transferToPersonal error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 把微信企业付款的结果Map转化成TransferToPersonalResult对象
+     * @param transferToPersonalResultMap
+     * @return
+     */
+    public static TransferToPersonalResult transferToPersonalResult(Map<String, String> transferToPersonalResultMap) {
+        TransferToPersonalResult transferToPersonalResult = new TransferToPersonalResult();
+        transferToPersonalResult.setResultCode(transferToPersonalResultMap.get("result_code"));
+        transferToPersonalResult.setMchAppid(transferToPersonalResultMap.get("mch_appid"));
+        transferToPersonalResult.setMchId(transferToPersonalResultMap.get("mchid"));
+        transferToPersonalResult.setPartnerTradeNo(transferToPersonalResultMap.get("partner_trade_no"));
+        transferToPersonalResult.setPaymentNo(transferToPersonalResultMap.get("payment_no"));
+        transferToPersonalResult.setPaymentTime(transferToPersonalResultMap.get("payment_time"));
+        return transferToPersonalResult;
     }
 
     /**
