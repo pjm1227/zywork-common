@@ -15,4 +15,9 @@ public class WeixinConstants {
      */
     public static final String ERROR_CODE_STR = "errcode";
 
+    /**
+     * 微信返回消息
+     */
+    public static final String ERROR_MSG_STR = "errmsg";
+
 }

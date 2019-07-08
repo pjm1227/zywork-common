@@ -1,37 +1,24 @@
 package top.zywork.weixin;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import top.zywork.common.HttpUtils;
-import top.zywork.common.IOUtils;
 import top.zywork.common.UUIDUtils;
-import top.zywork.enums.*;
+import top.zywork.enums.CertTypeEnum;
+import top.zywork.enums.ContentTypeEnum;
+import top.zywork.enums.MIMETypeEnum;
+import top.zywork.enums.SSLProtocolEnum;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.AlgorithmParameterSpec;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 微信登录和支付相关工具类<br/>
+ * 微信支付相关工具类<br/>
  *
  * 创建于2018-12-04<br/>
  *
@@ -39,89 +26,7 @@ import java.util.Map;
  * @version 1.0
  */
 @Slf4j
-public class WeixinUtils {
-
-
-    public static final String EXTRA_PARAMS = "extraParams";
-
-    public static final String EXTRA_PARAMS_SEPARATOR = "__";
-
-    /**
-     * 从哪个url进入到公众号授权界面
-     * @param appId
-     * @param loginRedirectUrl
-     * @param extraParams http://zywork.top/test.html__notAuthUrl__shareCode
-     * @return
-     */
-    public static String gzhAuthorizeUrl(String appId, String loginRedirectUrl, String extraParams) {
-        loginRedirectUrl += "?" + EXTRA_PARAMS + "=" + extraParams;
-        return GzhConstants.AUTHORIZE_URL.replace("{APP_ID}", appId).replace("{REDIRECT_URL}", loginRedirectUrl);
-    }
-
-    /**
-     * 微信公众号授权登录通过code获取access_token和openid
-     * @param appId 公众号id
-     * @param appSecret 公众号key
-     * @param code 微信授权回调所返回的code
-     * @return
-     */
-    public static GzhAuth authGzh(String appId, String appSecret, String code) {
-        String accessor = HttpUtils.get(GzhConstants.AUTH_ACCESS_TOKEN_URL.replace("{APP_ID}", appId).replace("{APP_KEY}", appSecret).replace("{CODE}", code));
-        GzhAuth gzhAuth = null;
-        if (StringUtils.isNotEmpty(accessor) && !accessor.contains(WeixinConstants.ERROR_CODE_STR)) {
-            JSONObject accessorJSON = JSON.parseObject(accessor);
-            gzhAuth = new GzhAuth();
-            gzhAuth.setAccessToken(accessorJSON.getString("access_token"));
-            gzhAuth.setOpenid(accessorJSON.getString("openid"));
-        }
-        return gzhAuth;
-    }
-
-    /**
-     * 微信小程序授权登录，通过code来获取session_key 和 openid
-     * @param appId 小程序id
-     * @param appSecret 小程序key
-     * @param code 小程序登录时获取的code
-     * @return
-     */
-    public static XcxAuth authXcx(String appId, String appSecret, String code) {
-        String accessor = HttpUtils.get(XcxConstants.AUTH_ACCESS_URL.replace("{APP_ID}", appId).replace("{APP_KEY}", appSecret).replace("{JSCODE}", code));
-        XcxAuth xcxAuth = null;
-        if (StringUtils.isNotEmpty(accessor) && !accessor.contains(WeixinConstants.ERROR_CODE_STR)) {
-            JSONObject accessorJSON = JSON.parseObject(accessor);
-            xcxAuth = new XcxAuth();
-            xcxAuth.setSessionKey(accessorJSON.getString("session_key"));
-            xcxAuth.setOpenid(accessorJSON.getString("openid"));
-            xcxAuth.setUnionid(accessorJSON.getString("unionid"));
-        }
-        return xcxAuth;
-    }
-
-    /**
-     * 通过access_token和openid获取微信用户信息
-     * @param gzhAuth WeixinAuth对象
-     * @return
-     */
-    public static WeixinUser userInfo(GzhAuth gzhAuth) {
-        WeixinUser weixinUser = null;
-        if (gzhAuth != null) {
-            String userInfo = HttpUtils.get(GzhConstants.USER_INFO.replace("{ACCESS_TOKEN}", gzhAuth.getAccessToken()).replace("{OPENID}", gzhAuth.getOpenid()));
-            if (StringUtils.isNotEmpty(userInfo) && !userInfo.contains(WeixinConstants.ERROR_CODE_STR)) {
-                JSONObject userInfoJSON = JSON.parseObject(userInfo);
-                weixinUser = new WeixinUser();
-                weixinUser.setOpenid(gzhAuth.getOpenid());
-                weixinUser.setNickname(userInfoJSON.getString("nickname"));
-                weixinUser.setHeadimgurl(userInfoJSON.getString("headimgurl"));
-                weixinUser.setSex(userInfoJSON.getString("sex"));
-                weixinUser.setCountry(userInfoJSON.getString("country"));
-                weixinUser.setProvince(userInfoJSON.getString("province"));
-                weixinUser.setCity(userInfoJSON.getString("city"));
-                // weixinUser.setPrivilege((String[]) userInfoJSON.getJSONArray("privilege").toArray());
-                weixinUser.setUnionid(userInfoJSON.getString("unionid"));
-            }
-        }
-        return weixinUser;
-    }
+public class WeixinPayUtils {
 
     /**
      * 准备统一下单需要提交的数据
@@ -338,7 +243,7 @@ public class WeixinUtils {
      * @return 发送红包的结果 Map
      */
     public static Map<String, String> sendRedpackGzh(String appid, String mchId, String apiKey, String openid, String ip, String mchBillNo,
-                                   String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId, String certPath) {
+                                                     String sendName, int totalAmount, int totalNum, String wishing, String actName, String remark, String sceneId, String certPath) {
         Map<String, String> redpackData = redpackData(appid, mchId, apiKey, openid, ip, mchBillNo, sendName, totalAmount, totalNum, wishing, actName, remark, sceneId);
         try {
             String redpackResult = HttpUtils.post(PayConstants.SEND_RED_PACK_GZH, WXPayUtil.mapToXml(redpackData), MIMETypeEnum.XML,
@@ -481,25 +386,4 @@ public class WeixinUtils {
         return responseMap.get(PayConstants.ERR_CODE_DES);
     }
 
-    /**
-     * 根据sessionKey，加密数据和iv向量解密手机号信息
-     * @param sessionKey
-     * @param encryptedData
-     * @param iv
-     * @return
-     */
-    public static XcxPhone decryptPhoneData(String sessionKey, String encryptedData, String iv) {
-        Base64.Decoder decoder = Base64.getDecoder();
-        AlgorithmParameterSpec ivSpec = new IvParameterSpec(decoder.decode(iv));
-        try {
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            SecretKeySpec keySpec = new SecretKeySpec(decoder.decode(sessionKey), "AES");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-            String dataStr = new String(cipher.doFinal(decoder.decode(encryptedData)),CharsetEnum.UTF8.getValue());
-            return IOUtils.readJsonStrToObject(dataStr, XcxPhone.class);
-        } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
-            log.error("decryptData error: {}", e.getMessage());
-        }
-        return null;
-    }
 }

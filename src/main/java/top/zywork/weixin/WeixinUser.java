@@ -26,6 +26,7 @@ public class WeixinUser {
     private String city;
     private String country;
     private String headimgurl;
-    private String[] privilege;
     private String unionid;
+    private Integer subscribe;
+
 }
