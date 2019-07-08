@@ -50,7 +50,7 @@ public class XcxTemplateMsg {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    class MsgData {
+    public static class MsgData {
         /**
          * 消息值
          */

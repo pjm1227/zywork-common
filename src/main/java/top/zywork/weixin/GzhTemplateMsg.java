@@ -50,7 +50,7 @@ public class GzhTemplateMsg {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    class Miniprogram {
+    public static class Miniprogram {
         /**
          * 小程序appid，必填
          */
@@ -65,7 +65,7 @@ public class GzhTemplateMsg {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    class MsgData {
+    public static class MsgData {
         /**
          * 消息的值，必填
          */
